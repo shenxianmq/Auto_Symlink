@@ -13,6 +13,8 @@ media_dir = /path/to/media/dir
 
 symlink_dir = /path/to/symlink_dir
 
+需要同步几个目录就新建几个txt文件，文件中配置好上面两个变量即可
+
 然后"python auto_symlink.py"
 
 Tips：在windows系统中使用时，需要"以管理员模式运行"
