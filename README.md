@@ -5,6 +5,14 @@
 
 使用方法：
 
-在config.txt中配置好"媒体文件夹 => media_dir"和"软链接文件夹 => symlink_dir",然后"python auto_symlink.py"
+支持多目录自动同步
 
-Tips：在windows系统中使用时，需要"以管理员运行"
+在config文件夹中新建txt文件，文件名随意在文件中配置好如下两个变量（路径不要加引号）：
+
+media_dir = /path/to/media/dir
+
+symlink_dir = /path/to/symlink_dir
+
+然后"python auto_symlink.py"
+
+Tips：在windows系统中使用时，需要"以管理员模式运行"
