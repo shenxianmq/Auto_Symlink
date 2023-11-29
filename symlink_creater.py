@@ -10,7 +10,7 @@ class SymlinkCreator:
         self.source_folder = source_folder
         self.target_folder = target_folder
         self.num_threads = num_threads
-        self.allowed_extensions = (".mkv", ".iso", ".ts", ".mp4", ".avi", ".rmvb", ".wmv", ".m2ts")
+        self.allowed_extensions = (".mkv", ".iso", ".ts", ".mp4", ".avi", ".rmvb", ".wmv", ".m2ts", ".mpg", ".flv", ".rm", ".mov")
         self.created_links = 0
         self.existing_links = 0
         self.file_queue = queue.Queue()
