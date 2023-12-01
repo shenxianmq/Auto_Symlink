@@ -5,13 +5,15 @@
 
 使用方法：
 
-支持多目录自动同步，多目录同步时，软链接目录不可以是同一个目录，否则清除无效文件夹的时候，会误以为云端不存在对应的文件夹而清除
+**支持多目录自动同步，多目录同步时，软链接目录不可以是同一个目录，否则清除无效文件夹的时候，会误以为云端不存在对应的文件夹而清除**
 
 在config文件夹中新建txt文件，文件名随意在文件中配置好如下两个变量（路径不要加引号）：
 
-media_dir = /path/to/media/dir
+cloud_path = /path/to/your/cloud_path #网盘挂载到本地的目录，用于判断是否发生掉盘的情况
 
-symlink_dir = /path/to/symlink_dir
+media_dir = /path/to/media/dir #网盘媒体库目录
+
+symlink_dir = /path/to/symlink_dir #要链接到本地的目录
 
 需要同步几个目录就新建几个txt文件，文件中配置好上面两个变量即可
 
