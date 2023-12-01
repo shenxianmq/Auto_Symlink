@@ -27,9 +27,13 @@ def run():
                 dir_dict[key.strip()] = value.strip()
         num_threads = 8
         timeout_seconds = 5  # 线程解锁时间
+        cloud_path = dir_dict['cloud_path']
         media_dir = dir_dict['media_dir']
         symlink_dir = dir_dict['symlink_dir']
         message_list = []
+
+        if not os.path.exists(cloud_path):
+            raise FileNotFoundError(f'挂载目录不存在，请检查挂载目录{cloud_path}')
 
         metadata_copyer = MetadataCopyer(media_dir, symlink_dir, num_threads)
         message = metadata_copyer.run()
