@@ -5,18 +5,25 @@
 
 使用方法：
 
+1.直接运行py文件
+
 **支持多目录自动同步，多目录同步时，软链接目录不可以是同一个目录，否则清除无效文件夹的时候，会误以为云端不存在对应的文件夹而清除**
 
-在config文件夹中新建txt文件，文件名随意在文件中配置好如下两个变量（路径不要加引号）：
+第一次运行程序后会在config文件夹中生成config.yaml文件，然后打开config.yaml后根据注释进行自定义配置即可
 
-cloud_path = /path/to/your/cloud_path #网盘挂载到本地的目录，用于判断是否发生掉盘的情况
-
-media_dir = /path/to/media/dir #网盘媒体库目录
-
-symlink_dir = /path/to/symlink_dir #要链接到本地的目录
-
-需要同步几个目录就新建几个txt文件，文件中配置好上面两个变量即可
-
-然后"python auto_symlink.py"
+配置好后'python auto_symlink.py'
 
 Tips：在windows系统中使用时，需要"以管理员模式运行"
+
+2.docker运行
+
+docker run -d \
+  --name auto_symlink \
+  -e TZ=Asia/Shanghai \
+  -v /volume1/CloudNAS:/volume1/CloudNAS:rslave \
+  -v /volume2/Media:/Media \
+  -v /volume1/docker/auto_symlink/config:/app/config \
+  shenxianmq/auto_symlink:latest
+
+  Tips：网盘路径映射进容器的时候，必须为绝对路径，否则软链接会找不到正确的路径
+
