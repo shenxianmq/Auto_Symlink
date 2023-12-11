@@ -89,6 +89,7 @@ class AutoUploader:
 
 if __name__ == '__main__':
     auto_uploader = AutoUploader()
-    while True:
-        auto_uploader.run()
-        time.sleep(999999)
+    auto_uploader.run()
+    # while True:
+    #     auto_uploader.run()
+    #     time.sleep(999999)
