@@ -159,6 +159,7 @@ class AutoSync:
 
 if __name__ == "__main__":
     auto_sync = AutoSync()
-    while True:
-        auto_sync.run()
-        time.sleep(999999)
+    auto_sync.run()
+    # while True:
+    #     auto_sync.run()
+    #     time.sleep(999999)
