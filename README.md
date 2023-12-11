@@ -20,7 +20,7 @@ Tips：在windows系统中使用时，需要"以管理员模式运行"
 docker run -d \
   --name auto_symlink \
   -e TZ=Asia/Shanghai \
-  -v /volume1/CloudNAS:/volume1/CloudNAS:rslave \
+  -v /volume1/CloudNAS:/volume1/CloudNAS:rslave \  #映射目录自己根据实际情况修改
   -v /volume2/Media:/Media \
   -v /volume1/docker/auto_symlink/config:/app/config \
   shenxianmq/auto_symlink:latest
