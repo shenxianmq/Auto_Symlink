@@ -66,8 +66,8 @@ class AutoSync:
         if not sync_enabled:
             print_message('当前并未开启同步状态,如需开启,请至config.yaml中将sync_enabled设为true')
             return
-        sync_status = yaml_data.get('sync_status', False)
-        if sync_status:
+        sync_scheduled = yaml_data.get('sync_scheduled', False)
+        if sync_scheduled:
             while True:
                 # 等待指定秒数
                 sync_time = self.caculate_time(yaml_data.get('sync_time'))
@@ -130,9 +130,9 @@ class AutoSync:
                 metadata_ext = self.parse_extensions(dir_dict.get('metadata_ext',self.metadata_ext))
                 upload_enabled = dir_dict.get('upload_enabled',True)
                 if not upload_enabled:
-                    print_message(f'目录同步未开启:{media_dir} => = {symlink_dir}')
+                    print_message(f'目录同步未开启:{media_dir} => {symlink_dir}')
                     return 0
-                print_message(f'开始同步目录:{media_dir} => = {symlink_dir}')
+                print_message(f'开始同步目录:{media_dir} => {symlink_dir}')
 
                 if not os.path.exists(cloud_path):
                     raise FileNotFoundError(f'挂载目录不存在,请检查挂载目录{cloud_path}')
@@ -159,7 +159,6 @@ class AutoSync:
 
 if __name__ == "__main__":
     auto_sync = AutoSync()
-    auto_sync.run()
-    # while True:
-    #     auto_sync.run()
-    #     time.sleep(999999)
+    while True:
+        auto_sync.run()
+        time.sleep(999999)

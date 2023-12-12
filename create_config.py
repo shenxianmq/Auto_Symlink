@@ -23,14 +23,14 @@ def create_config_yaml():
 #同步状态:true为开启,false为关闭
 sync_enabled: false
 #定时同步状态:true为开启,false为关闭
-sync_status: false
+sync_scheduled: false
 #定时同步的时间间隔:单位为秒,支持乘法表达式,比如一天就是24*3600
 sync_time: "3600"
 
 #上传元数据:true为开启,false为关闭
 upload_enabled: false
 #定时上传元数据:true为开启,false为关闭
-upload_metadata: false
+upload_scheduled: false
 #定时上传元数据的时间间隔:单位为秒,支持乘法表达式,比如一天就是24*3600
 upload_sync_time: "24*3600"
 

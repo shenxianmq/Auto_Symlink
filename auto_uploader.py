@@ -57,8 +57,8 @@ class AutoUploader:
             print_message('当前并未开启上传状态,如需开启,请至config.yaml中将upload_enabled设为true')
             return
 
-        upload_metadata = yaml_data.get('upload_metadata',False)
-        if upload_metadata:
+        upload_scheduled = yaml_data.get('upload_scheduled',False)
+        if upload_scheduled:
             while True:
                 # 等待指定秒数
                 upload_sync_time = self.caculate_time(yaml_data.get('upload_sync_time',False))
@@ -89,7 +89,6 @@ class AutoUploader:
 
 if __name__ == '__main__':
     auto_uploader = AutoUploader()
-    auto_uploader.run()
-    # while True:
-    #     auto_uploader.run()
-    #     time.sleep(999999)
+    while True:
+        auto_uploader.run()
+        time.sleep(999999)
