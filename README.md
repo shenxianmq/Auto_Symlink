@@ -20,9 +20,12 @@ Tips：在windows系统中使用时，需要"以管理员模式运行"
 docker run -d \
   --name auto_symlink \
   -e TZ=Asia/Shanghai \
-  -v /volume1/CloudNAS:/volume1/CloudNAS:rslave \  #映射目录自己根据实际情况修改
+  -v /volume1/CloudNAS:/volume1/CloudNAS:rslave \  #网盘映射路径左右要一致
   -v /volume2/Media:/Media \
   -v /volume1/docker/auto_symlink/config:/app/config \
+  --restart unless-stopped \
+  --log-opt max-size=10m \
+  --log-opt max-file=3 \
   shenxianmq/auto_symlink:latest
 
   Tips：网盘路径映射进容器的时候，必须为绝对路径，否则软链接会找不到正确的路径
