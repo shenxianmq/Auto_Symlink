@@ -1,23 +1,4 @@
-import os
-from shentools import *
-
-def create_config():
-    print_message('开始初始化配置文件...')
-    if not os.path.exists('./config/config_done.txt'):
-        if not os.path.exists('./config/config.yaml'):
-            create_config_yaml()
-        if not os.path.exists('./config/last_sync.yaml'):
-            create_last_sync_yaml()
-    else:
-        if not os.path.exists('./config/config.yaml'):
-            create_config_yaml()
-        if not os.path.exists('./config/last_sync.yaml'):
-            create_last_sync_yaml()
-    with open('./config/config_done.txt','w',encoding='utf-8') as f:
-        f.write('')
-
-def create_config_yaml():
-    content = '''#注:yaml文件很注重缩进,请不要随意删减空格,不确定的情况下请直接通过复制粘贴来添加同步目录
+#注:yaml文件很注重缩进,请不要随意删减空格,不确定的情况下请直接通过复制粘贴来添加同步目录
 #如果想要重置配置文件状态,直接删除"/config/config_done.txt"即可
 
 #配置文件支持热重载,即当程序检测到配置文件更改后,会重新载入配置文件,使配置生效,若程序报错,请重启容器
@@ -126,17 +107,4 @@ sync_list:
     #软链接/strm文件指定后缀名
     symlink_ext: ".mkv;.iso;.ts;.mp4;.avi;.rmvb;.wmv;.m2ts;.mpg;.flv;.rm;.mov"
     #元数据指定后缀名
-    metadata_ext: ".nfo;.jpg;.png;.svg;.ass;.srt;.sup"'''
-    with open('./config/config.yaml','w',encoding='utf-8') as f:
-        f.write(content)
-
-def create_last_sync_yaml():
-    content = '''last_sync_list:
-  - "/path/to/cloud_path"'''
-    with open('./config/last_sync.yaml','w',encoding='utf-8') as f:
-        f.write(content)
-
-if __name__ == '__main__':
-    working_directory = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(working_directory)
-    create_config()
+    metadata_ext: ".nfo;.jpg;.png;.svg;.ass;.srt;.sup"

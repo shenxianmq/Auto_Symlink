@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  auto_symlink:
+    image: shenxianmq/auto_symlink:latest
+    container_name: auto_symlink
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - /volume1/CloudNAS:/volume1/CloudNAS:rslave
+      - /volume2/Media:/Media
+      - /volume1/docker/auto_symlink/config:/app/config
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: '10m'
+        max-file: '3'

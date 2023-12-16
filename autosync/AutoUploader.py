@@ -1,7 +1,7 @@
 import os
 import time
 import yaml
-from print_message import print_message
+from shentools import *
 from create_config import create_config
 from metadata_copyer import MetadataCopyer
 
@@ -89,6 +89,7 @@ class AutoUploader:
 
 if __name__ == '__main__':
     auto_uploader = AutoUploader()
-    while True:
-        auto_uploader.run()
-        time.sleep(999999)
+    auto_uploader.run()
+    # while True:
+    #     auto_uploader.run()
+    #     time.sleep(999999)

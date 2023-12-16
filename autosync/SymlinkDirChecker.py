@@ -4,7 +4,7 @@ import threading
 import time
 import queue
 import logging
-from print_message import print_message
+from shentools import *
 
 
 class SymlinkDirChecker:
@@ -33,14 +33,15 @@ class SymlinkDirChecker:
                     print_message(f"线程 {thread_name}: 删除失效文件夹 => {dir_path}")
                     # logging.info(f"线程 {thread_name}: 删除失效文件夹 => {dir_path}")
                 else:
-                    print_message(f"线程 {thread_name}: 跳过{dir_path}")
+                    # print_message(f"线程 {thread_name}: 跳过{dir_path}")
+                    pass
             except Exception as e:
                 print_message(f"线程 {thread_name}: 发生异常 => {e}")
 
             self.file_queue.task_done()
 
     def thread_timeout_handler(self):
-        print_message("线程运行超时，停止该线程")
+        # print_message("线程运行超时，停止该线程")
         for thread in self.threads:
             thread.join()
 
@@ -75,13 +76,12 @@ class SymlinkDirChecker:
 
             for thread in self.threads:
                 thread.join()
-
         finally:
             timer.cancel()
 
         end_time = time.time()
         total_time = end_time - start_time
-        message = f"总耗时: {total_time:.2f} 秒, 共处理文件夹数：{self.total_num}, 共清理失效文件夹数：{self.error_dirs_num}"
-        print_message(message)
+        message = f"清理失效文件夹:总耗时 {total_time:.2f} 秒, 共处理文件夹数：{self.total_num}, 共清理失效文件夹数：{self.error_dirs_num}"
+        print_message('完成::: 清理失效文件夹')
         # logging.info(message)
-        return total_time
+        return total_time,message

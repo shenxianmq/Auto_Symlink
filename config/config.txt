@@ -1,3 +1,0 @@
-cloud_path = /path/to/your/cloud_path
-media_dir = /path/to/media/dir
-symlink_dir = /path/to/symlink_dir

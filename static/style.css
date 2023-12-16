@@ -1,0 +1,35 @@
+/* static/style.css */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+#container {
+    text-align: center;
+}
+
+h1 {
+    color: #333;
+}
+
+textarea {
+    width: 80%;
+    margin-bottom: 10px;
+    outline: none; /* 去掉轮廓边框 */
+}
+
+button {
+    margin-top: 10px;
+    font-size: 16px; /* 设置按钮字体大小 */
+    padding: 5px 10px; /* 设置按钮内边距 */
+}
+
+
+#refreshButton {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: 30px;
+    transform: translate(-50%, -50%);
+}
