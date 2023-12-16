@@ -22,7 +22,7 @@
    docker run -d \
      --name auto_symlink \
      -e TZ=Asia/Shanghai \
-     -v /your/cloud/path:/cloudpath:rslave \
+     -v /your/cloud/path:/your/cloud/path:rslave \
      -v /your/media/path:/media \
      -v /path/to/auto_symlink/config:/app/config \
      --restart unless-stopped \
@@ -53,7 +53,7 @@ docker run -d \
 
 #### 命令说明：
 
-- `-v /your/cloud/path:/cloudpath:rslave`: 将你的云盘路径（`/your/cloud/path`）映射到容器内的路径（`/cloudpath`）。`rslave` 表示使用相对于宿主机的从属挂载模式。确保左边的路径是你的云盘在本地的绝对路径。
+- `-v /your/cloud/path:/cloudpath:rslave`: 将你的云盘路径（`/your/cloud/path`）映射到容器内的路径（`/your/cloud/path`）。`rslave` 表示使用相对于宿主机的从属挂载模式。确保左右路径保持一致,否则生成的软链接不是指向真实路径,导入emby中的时候会导致无法观看
 - `-v /your/media/path:/media`: 将你的媒体文件路径映射到容器内的 `/media` 目录。
 - `-v /path/to/auto_symlink/config:/app/config`: 将 `auto_symlink` 的配置目录映射到容器内的 `/app/config`。这样可以使容器中的 `auto_symlink` 使用外部的配置文件。
 - `--restart unless-stopped`: 设置容器在退出时自动重启。
