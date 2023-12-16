@@ -22,9 +22,10 @@
    docker run -d \
      --name auto_symlink \
      -e TZ=Asia/Shanghai \
-     -v /your/cloud/path:/your/cloud/path:rslave \
-     -v /your/media/path:/media \
-     -v /path/to/auto_symlink/config:/app/config \
+     -v /volume1/CloudNAS:/volume1/CloudNAS:rslave \
+     -v /volume2/Media:/Media \
+     -v /volume1/docker/auto_symlink/config:/app/config \
+     -p 8095:8095 \
      --restart unless-stopped \
      --log-opt max-size=10m \
      --log-opt max-file=3 \
@@ -42,9 +43,10 @@
 docker run -d \
   --name auto_symlink \
   -e TZ=Asia/Shanghai \
-  -v /your/cloud/path:/cloudpath:rslave \
-  -v /your/media/path:/media \
-  -v /path/to/auto_symlink/config:/app/config \
+  -v /volume1/CloudNAS:/volume1/CloudNAS:rslave \
+  -v /volume2/Media:/Media \
+  -v /volume1/docker/auto_symlink/config:/app/config \
+  -p 8095:8095 \
   --restart unless-stopped \
   --log-opt max-size=10m \
   --log-opt max-file=3 \
@@ -55,6 +57,7 @@ docker run -d \
 
 - `-v /your/cloud/path:/cloudpath:rslave`: 将你的云盘路径（`/your/cloud/path`）映射到容器内的路径（`/your/cloud/path`）。`rslave` 表示使用相对于宿主机的从属挂载模式。确保左右路径保持一致,否则生成的软链接不是指向真实路径,导入emby中的时候会导致无法观看
 - `-v /your/media/path:/media`: 将你的媒体文件路径映射到容器内的 `/media` 目录。
+- `-p 8095:8095`: 映射8095端口,此端口访问的是日志页面。
 - `-v /path/to/auto_symlink/config:/app/config`: 将 `auto_symlink` 的配置目录映射到容器内的 `/app/config`。这样可以使容器中的 `auto_symlink` 使用外部的配置文件。
 - `--restart unless-stopped`: 设置容器在退出时自动重启。
 - `--log-opt max-size=10m`: 设置容器日志文件的最大大小为 10MB。
