@@ -1,0 +1,10 @@
+*.DS_Store
+# 忽略所有 __pycache__ 目录
+__pycache__/
+
+.vscode/
+
+# 忽略所有 .idea 目录
+.idea/
+
+config/*
