@@ -69,7 +69,7 @@ func_order:
 #全局设置结束
 
 sync_list:
-    # 需要添加多个目录同步,直接复制粘贴从"- cloud_path 到 metadata_ext"为止的内容进行修改即可
+    # 需要添加多个目录同步,直接复制粘贴从"- cloud_path:... 到 metadata_ext:..."为止的内容进行修改即可
     #下面的三个路径填的是容器内的映射路径
     #注意：多个目录同步,symlink_dir不能相同,否则全同步时会误删文件
 
