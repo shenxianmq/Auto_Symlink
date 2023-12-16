@@ -6,6 +6,8 @@ services:
     container_name: auto_symlink
     environment:
       - TZ=Asia/Shanghai
+    ports:
+      - 8095:8095
     volumes:
       - /volume1/CloudNAS:/volume1/CloudNAS:rslave
       - /volume2/Media:/Media
