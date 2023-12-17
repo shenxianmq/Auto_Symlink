@@ -1,7 +1,7 @@
 import os
 import time
 import yaml
-from shentools import *
+from utils.shentools import *
 from create_config import create_config
 from metadata_copyer import MetadataCopyer
 

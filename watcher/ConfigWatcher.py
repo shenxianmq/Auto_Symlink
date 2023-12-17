@@ -2,12 +2,12 @@ import os
 import sys
 import time
 import yaml
-from shentools import *
+from utils.shentools import *
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
 class ConfigFileWatcher:
-    def __init__(self, watching_folder, config_filenames):
+    def __init__(self, watching_folder='./config', config_filenames=["config.yaml", "last_sync.yaml"]):
         self.watching_folder = watching_folder
         self.config_filenames = config_filenames
         self.event_handler = ConfigFileHandler(watching_folder,config_filenames)
@@ -17,7 +17,6 @@ class ConfigFileWatcher:
         self.observer.schedule(self.event_handler, path=self.watching_folder, recursive=False)
         print_message('配置文件监测已经开启')
         self.observer.start()
-
         try:
             while True:
                 time.sleep(1)
@@ -63,15 +62,10 @@ class ConfigFileHandler(FileSystemEventHandler):
                 self.config_dict[file_name] = yaml_data
                 restart_program()
 
-    def restart_container(self):
-        script_path = sys.argv[0]
-        os.execl(sys.executable, sys.executable, script_path, *sys.argv[1:])
-
 if __name__ == "__main__":
     working_directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(working_directory)
     watching_folder = "./config"
     config_filenames = ["config.yaml", "last_sync.yaml"]  # Replace with your actual config file paths
-
     watcher = ConfigFileWatcher(watching_folder, config_filenames)
     watcher.start_watching()

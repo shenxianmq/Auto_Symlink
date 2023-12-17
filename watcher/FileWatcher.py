@@ -2,15 +2,13 @@ import os
 import shutil
 from pathlib import Path
 import time
+import yaml
 import urllib.parse
 from typing import Any
-from shentools import *
+from utils.shentools import *
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 from watchdog.observers.polling import PollingObserver
-working_directory = os.path.dirname(os.path.abspath(__file__))
-os.chdir(working_directory)
-
 
 class FileMonitorHandler(FileSystemEventHandler):
     """
@@ -71,6 +69,7 @@ class FileMonitor:
         self._alist_path = {}
         self._cloud_url = {}
         self._cloud_type = {}
+        self.config_path = './config/config.yaml'
         self.add_monitor_conf(sync_list)
 
     def start(self):
@@ -81,7 +80,6 @@ class FileMonitor:
             raise ValueError("未找到目录监控配置，请检查配置文件。")
 
         timeout = 10
-        observer_list = []
         for source_dir in self._symlink_dir.keys():
             if not self._observer_enabled.get(source_dir):
                 print_message(f'目录未处于监控状态：{source_dir}。若要启用，请在config.yaml的sync_list中将"observer_enabled"设置为"true"')
@@ -98,17 +96,13 @@ class FileMonitor:
             observer.schedule(event_handler=FileMonitorHandler(str(source_dir), self),
                               path=str(source_dir),
                               recursive=True)
-
             print_message(f"开始监控文件夹：{str(source_dir)} 转移方式：{str(monitoring_mode)}")
             observer.daemon = True
-            observer_list.append(observer)
-        try:
-            for observer in observer_list:
+            try:
                 observer.start()
-        except ConnectionAbortedError:
-            print_message('监控程序发生错误。正在重新启动...')
-            restart_program()
-                # 重新启动逻辑在此处
+            except ConnectionAbortedError:
+                print_message('监控程序发生错误。正在重新启动...')
+                restart_program()
 
     def add_monitor_conf(self,monitor_confs: list):
         # 存储目录监控配置
@@ -131,7 +125,6 @@ class FileMonitor:
             self._alist_path[source_dir] = monitor_conf.get("alist_path", "")
             self._cloud_url[source_dir] = monitor_conf.get("cloud_url", "")
             self._cloud_type[source_dir] = monitor_conf.get("cloud_type", "")
-
 
     def event_handler(self, event, source_dir: str, event_path: str):
         """
@@ -164,9 +157,6 @@ class FileMonitor:
                 or event_path.find("/CERTIFICATE") != -1):
             print_message(f"{event_path} 是原盘文件夹，跳过处理")
             return
-        print_message(f"event_type::: {event.event_type}")
-
-        print_message(f"event_path {event_path} source_path {source_dir}")
         if event.event_type == "created":
             if  os.path.exists(event_path):
                 self.event_handler_created(event, event_path, source_dir)
@@ -178,7 +168,6 @@ class FileMonitor:
 
     def event_handler_created(self, event, event_path: str, source_dir: str):
         try:
-            print_message(f"event_handler_created event_path:::{event_path}")
             # 转移路径
             symlink_dir = self._symlink_dir.get(source_dir)
             symlink_ext = self.__parse_extensions(self._symlink_ext.get(source_dir))
@@ -227,7 +216,6 @@ class FileMonitor:
             print_message(f"event_handler_created error: {e}")
 
     def event_handler_deleted(self, event_path: str, source_dir: str):
-        time.sleep(1.5)
         cloud_path = self._cloud_path.get(source_dir)
         symlink_mode = self._symlink_mode.get(source_dir)
         if not os.path.exists(cloud_path):
@@ -247,8 +235,6 @@ class FileMonitor:
             deleted_target_path = os.path.join(dir_path, f"{base_name}.strm")
         else:
             deleted_target_path = event_path.replace(source_dir, dest_dir)
-
-
         deleted_path = Path(deleted_target_path)
         if os.path.exists(event_path):
             print_message(f"源路径存在，跳过删除::: {deleted_target_path}")
@@ -387,5 +373,21 @@ class FileMonitor:
         # 返回一个元组
         return tuple(extensions_list)
 
+
+def read_config(config_path):
+    try:
+        with open(config_path, 'r', encoding='utf-8') as file:
+            data = yaml.safe_load(file)
+        return data
+    except Exception as e:
+        print_message(f"配置文件出现问题: {e}")
+        return None
+
 if __name__ == '__main__':
-	FileMonitor().start()
+    working_directory = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(working_directory)
+    yaml_data = read_config('./config/config.yaml')
+    sync_list = yaml_data.get('sync_list')
+    FileMonitor(sync_list).start()
+    while True:
+        time.sleep(3600)

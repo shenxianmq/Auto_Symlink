@@ -4,7 +4,7 @@ import threading
 import time
 import queue
 import logging
-from shentools import *
+from utils.shentools import *
 
 
 class SymlinkDirChecker:

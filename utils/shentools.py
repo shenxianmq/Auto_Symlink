@@ -1,4 +1,3 @@
-import os
 import sys
 import pytz
 import logging
@@ -28,8 +27,12 @@ def print_message(message):
     logging.info(message)
 
 def restart_program():
-    script_path = sys.argv[0]
-    os.execl(sys.executable, sys.executable, script_path, *sys.argv[1:])
+    # script_path = sys.argv[0]
+    # print(sys.executable, sys.executable, script_path, *sys.argv[1:])
+    # os.execl(sys.executable, sys.executable, script_path, *sys.argv[1:])
+    with open('./config/restart.txt','w',encoding='utf-8') as f:
+        f.write('')
+    # sys.exit()
 
 def get_next_run_time(seconds=10):
     """

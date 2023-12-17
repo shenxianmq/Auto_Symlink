@@ -1,51 +1,44 @@
-import os
+import subprocess
+import pathlib
 import time
-import threading
-import concurrent.futures
-from shentools import *
-from create_config import create_config
-from auto_symlink import AutoSync
-from watcher.ConfigWatcher import ConfigFileWatcher
+import sys
+import os
+from utils.shentools import *
+from utils.create_config import check_config
 
-def main():
-    current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    print_message(f"程序运行开始时间: {current_time}")
-    auto_sync_instance = AutoSync()
-    watching_folder = "./config"
-    config_filenames = ["config.yaml", "last_sync.yaml"]  # Replace with your actual config file paths
+def monitor_file(file_path, processes):
+    while not pathlib.Path(file_path).exists():
+        time.sleep(1)
 
-    # 创建更新目录线程，定时同步线程，目录监控线程
-    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
-        executor.submit(ConfigFileWatcher(watching_folder, config_filenames).start_watching)
-        executor.submit(auto_sync_instance.start_sync_scheduled)
-        executor.submit(auto_sync_instance.run)
-
-def keep_alive(exit_event):
-    while not exit_event.is_set():
-        time.sleep(3600)  # 线程保持活动，防止容器退出
+    # 文件出现后，终止之前启动的子进程
+    for process in processes:
+        process.terminate()
+        process.wait()
 
 if __name__ == '__main__':
     working_directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(working_directory)
-    configure_logging(log_file='./config/auto_symlink.log', max_log_size_bytes=10 * 1024 * 1024, date_format='%Y-%m-%d %H:%M:%S')
-    if not os.path.exists('./config/config_done.txt'):
-        create_config()
-    # 使用 threading.Event 作为退出信号
-    exit_event = threading.Event()
+    check_config()
+    # 启动四个不同的 Python 文件作为独立的进程
+    processes = []
+    task_commonds = ["ConfigFileWatcher start_watching",
+                     "AutoSync start_observer",
+                     "AutoSync start_sync_scheduled",
+                     "AutoSync sync_new_list"]
+    for task_command in task_commonds:
+        commond = ['python','task_run.py'] + task_command.split(" ")
+        process = subprocess.Popen(commond)
+        processes.append(process)
+        time.sleep(0.5)
 
-    # 启动主程序线程
-    main_thread = threading.Thread(target=main)
-    main_thread.start()
+    # 启动文件监控循环
+    monitor_file_path = './config/restart.txt'
+    monitor_file(monitor_file_path, processes)
 
-    # 启动保持活动的线程
-    keep_alive_thread = threading.Thread(target=keep_alive, args=(exit_event,))
-    keep_alive_thread.start()
+    # 删除触发文件
+    if os.path.exists(monitor_file_path):
+        os.remove(monitor_file_path)
 
-    # 等待主程序线程结束
-    main_thread.join()
-
-    # 设置退出信号
-    exit_event.set()
-
-    # 主程序运行结束后，保持活动的线程也会结束
-    keep_alive_thread.join()
+    # 重新启动当前程序
+    script_path = sys.argv[0]
+    os.execl(sys.executable, sys.executable, script_path, *sys.argv[1:])

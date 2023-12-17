@@ -1,18 +1,19 @@
 import os
+import shutil
 from utils.shentools import *
 
-def create_config():
+def check_config():
     print_message('开始初始化配置文件...')
-    if not os.path.exists('./config/config_done.txt'):
+    if os.path.exists('./config/config_done.txt'):
         if not os.path.exists('./config/config.yaml'):
             create_config_yaml()
         if not os.path.exists('./config/last_sync.yaml'):
             create_last_sync_yaml()
     else:
-        if not os.path.exists('./config/config.yaml'):
-            create_config_yaml()
-        if not os.path.exists('./config/last_sync.yaml'):
-            create_last_sync_yaml()
+        shutil.rmtree('./config')
+        os.mkdir('./config')
+        create_config_yaml()
+        create_last_sync_yaml()
     with open('./config/config_done.txt','w',encoding='utf-8') as f:
         f.write('')
 
@@ -98,7 +99,7 @@ sync_list:
     #本地链接模式
     #symlink:软链接模式,创建视频软链接,和windows中的快捷方式一样
     #strm:strm文件模式，创建包含网盘视频播放地址的文件,优点在于直接访问视频的原始地址,emby扫库会更快
-    symlink_mode: ""
+    symlink_mode: "symlink"
 
     #下面是strm模式才需要填写的内容,如果不用strm模式可以不填
     #clouddrive2的挂载根目录

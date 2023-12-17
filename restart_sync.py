@@ -1,7 +1,7 @@
 import os
 import time
 import threading
-from shentools import *
+from utils.shentools import *
 from auto_symlink import AutoSync
 
 configure_logging(log_file='./config/auto_symlink.log', max_log_size_bytes=10 * 1024 * 1024, date_format='%Y-%m-%d %H:%M:%S')

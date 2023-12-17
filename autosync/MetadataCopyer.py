@@ -4,7 +4,7 @@ import time
 import queue
 import logging
 import shutil
-from shentools import *
+from utils.shentools import *
 
 class MetadataCopyer:
     def __init__(self, source_folder, target_folder,allowed_extensions, num_threads=8):

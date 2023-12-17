@@ -3,7 +3,7 @@ import threading
 import time
 import queue
 import requests
-from shentools import *
+from utils.shentools import *
 
 class SymlinkChecker:
     def __init__(self, target_directory,symlink_mode,num_threads=4):
@@ -40,11 +40,14 @@ class SymlinkChecker:
     def check_strm(self,strm_path):
         with open(strm_path,'r',encoding='utf-8') as f:
             url = f.read().strip()
-        response = requests.get(url, stream=True)
-        if response.status_code == 200:
-            return True
-        else:
-            return False
+        response = requests.get(url, stream=True,timeout=5)
+        try:
+            if response.status_code == 200:
+                return True
+            else:
+                return False
+        except TimeoutError:
+            print_message(f"检查{self.symlink_name}/strm文件时超时: {strm_path}, 跳过s")
 
     def get_symlink_files(self):
         for root, dirs, files in os.walk(self.target_directory):

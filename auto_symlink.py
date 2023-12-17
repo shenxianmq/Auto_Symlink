@@ -1,20 +1,16 @@
 import os
 import yaml
 import re
-import threading
 from datetime import datetime
 from croniter import croniter
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from watcher.FileWatcher import FileMonitor
-from shentools import *
+from utils.shentools import get_timezone,print_message
 from autosync.MetadataCopyer import MetadataCopyer
 from autosync.SymlinkCreator import SymlinkCreator
 from autosync.SymlinkChecker import SymlinkChecker
 from autosync.SymlinkDirChecker import SymlinkDirChecker
-
-working_directory = os.path.dirname(os.path.abspath(__file__))
-os.chdir(working_directory)
 
 class AutoSync:
     def __init__(self, config_path='./config/config.yaml',last_sync_path='./config/last_sync.yaml'):
@@ -76,12 +72,11 @@ class AutoSync:
             print_message(f"Error: {e}")
             return 86400
 
-    def run(self):
+    def sync_new_list(self):
         if not self.yaml_data:
             print_message('无法正确读取配置文件"./config/config.yaml"的信息,请检查配置文件,或根据提示重置配置文件')
             return
         sync_enabled = self.yaml_data.get('sync_enabled',False) #默认同步关闭
-        observer_enabled = self.yaml_data.get('observer_enabled',False) #默认目录监控关闭
         sync_list = self.yaml_data.get('sync_list', [])
         if not sync_list:
             print_message('并未检测到同步目录配置,请到"./config/config.yaml"的sync_list项下进行目录配置')
@@ -96,41 +91,31 @@ class AutoSync:
         else:
             new_sync_list = [item for item in sync_list]
 
-        thread_list = []
-
-        #开始目录监控
-
-        if observer_enabled:
-            print_message('准备开始目录监控')
-            thread1 = threading.Thread(target=FileMonitor(sync_list).start)
-            thread_list.append(thread1)
-            thread1.start()
-        else:
-            print_message('未开启监控状态,如需开启,请至config.yaml中将全局设置中的"observer_enabled"设为"true"')
-
         if new_sync_list:
             if sync_enabled:
                 print_message('开始同步新增目录')
                 total_time = self.auto_symlink(new_sync_list,num_threads,new_sync=True)
                 print_message(f'同步完成,共耗时{total_time:.2f}秒.')
-            #     if observer_enabled:
-            #         print_message('新增目录同步完成,开始监控新增目录')
-            #         thread2 = threading.Thread(target=FileMonitor(new_sync_list).start)
-            #         thread_list.append(thread2)
-            #         thread2.start()
-            #     else:
-            #         print_message('新增目录同步完成,但未开启监控状态,如需开启,请至config.yaml中将全局设置中的"observer_enabled"设为"true"')
-
-            # else:
-            #     print_message('未开启同步状态,如需开启,请至config.yaml中将全局设置中的"sync_enabled"设为"true"')
         else:
             print_message('不存在新增目录,无须同步')
-        if thread_list:
-            try:
-                for thread in thread_list:
-                    thread.join()
-            except Exception as e:
-                print_message(f'error:{e}')
+
+    def start_observer(self):
+            if not self.yaml_data:
+                print_message('无法正确读取配置文件"./config/config.yaml"的信息,请检查配置文件,或根据提示重置配置文件')
+                return
+            observer_enabled = self.yaml_data.get('observer_enabled',False) #默认目录监控关闭
+            sync_list = self.yaml_data.get('sync_list', [])
+            if not sync_list:
+                print_message('并未检测到同步目录配置,请到"./config/config.yaml"的sync_list项下进行目录配置')
+                return
+
+            #开始目录监控
+
+            if observer_enabled:
+                print_message('准备开始目录监控')
+                FileMonitor(sync_list).start()
+            else:
+                print_message('未开启监控状态,如需开启,请至config.yaml中将全局设置中的"observer_enabled"设为"true"')
 
     def restart_sync(self):
         if not self.yaml_data:
@@ -189,10 +174,8 @@ class AutoSync:
                     print_message(f'定时同步时间 "{cron}" 格式不正确：{str(err)}')
             else:
                 seconds,message = self.calculate_seconds(cron)
-                print(seconds)
                 print_message(f'定时同步::: {message}')
                 try:
-                    print(get_next_run_time())
                     self._scheduler.add_job(func=self.auto_symlink,
                                             args=[sync_list,num_threads],
                                             trigger='interval',
@@ -310,6 +293,8 @@ class AutoSync:
 
 
 if __name__ == "__main__":
+    working_directory = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(working_directory)
     auto_sync = AutoSync()
     auto_sync.run()
     # auto_sync.start_sync_scheduled()

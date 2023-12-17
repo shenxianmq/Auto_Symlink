@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 import urllib.parse
 import requests
-from shentools import *
+from utils.shentools import *
 
 
 class SymlinkCreator:
