@@ -142,7 +142,7 @@ class FileMonitor:
         """
         cloud_path = self._cloud_path.get(source_dir)
         #延时5秒,防止网盘发生重启或者是掉挂载的情况
-        time.sleep(3)
+        time.sleep(1.5)
         if not os.path.exists(cloud_path):
             while True:
                 if not os.path.exists(cloud_path):
@@ -168,7 +168,11 @@ class FileMonitor:
 
         print_message(f"event_path {event_path} source_path {source_dir}")
         if event.event_type == "created":
-            self.event_handler_created(event, event_path, source_dir)
+            if  os.path.exists(event_path):
+                self.event_handler_created(event, event_path, source_dir)
+            else:
+                print_message(f"同步出错,该文件并不存在,程序即将重启::: {event_path}")
+                restart_program()
         if event.event_type == "deleted":
             self.event_handler_deleted(event_path, source_dir)
 
