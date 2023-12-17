@@ -4,22 +4,18 @@ from utils.shentools import *
 
 def check_config():
     print_message('开始初始化配置文件...')
-    if os.path.exists('./config/config_done.txt'):
-        if not os.path.exists('./config/config.yaml'):
-            create_config_yaml()
-        if not os.path.exists('./config/last_sync.yaml'):
-            create_last_sync_yaml()
-    else:
-        shutil.rmtree('./config')
-        os.mkdir('./config')
+    if not os.path.exists('./config/config.yaml'):
         create_config_yaml()
+        print_message('初始化配置文件成功:config.yaml')
+    if not os.path.exists('./config/last_sync.yaml'):
         create_last_sync_yaml()
-    with open('./config/config_done.txt','w',encoding='utf-8') as f:
-        f.write('')
+        print_message('初始化配置文件成功:last_sync.yaml')
+
+
 
 def create_config_yaml():
     content = '''#注:yaml文件很注重缩进,请不要随意删减空格,不确定的情况下请直接通过复制粘贴来添加同步目录
-#如果想要重置配置文件状态,直接删除"/config/config_done.txt"即可
+#如果想要恢复配置文件默认状态,直接删除配置文件后重启容器即可
 
 #配置文件支持热重载,即当程序检测到配置文件更改后,会重新载入配置文件,使配置生效,若程序报错,请重启容器
 #若更改配置文件后,并没有生效,则需要重新运行程序/重启容器才会生效
