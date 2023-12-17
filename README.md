@@ -103,12 +103,15 @@ tips：注意不要将`sync_list:`一起复制进去了，否则会只有一个�
 
 #### Q: 为什么运行完毕后，只同步了文件夹？
 **答**: 群晖`File Station`或部分工具不支持显示软连接，可以尝试用windows或者命令行查看。
-
 ---
 
 #### 配置文件说明
 - `config.yaml`: YAML 格式的主配置文件，详细配置可以参考文件中的注释。
 - `last_sync.yaml`: 保存已同步的目标目录，用于避免重复全同步。
+  
+**如果你觉得这个项目对你有帮助，可以考虑赞助我。你的支持将有助于这个项目的持续发展和改进。谢谢你的考虑！🙏**
+![image](https://github.com/shenxianmq/Auto_Symlink/assets/76782947/ec8a3d7d-41ba-42d9-bec0-73bad0147ce2)
+
 
 #### 开源许可
 本项目遵循 [LICENSE](LICENSE) 中所述的开源许可。
