@@ -7,7 +7,7 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
 class ConfigFileWatcher:
-    def __init__(self, watching_folder='./config', config_filenames=["config.yaml", "last_sync.yaml"]):
+    def __init__(self, watching_folder='./config', config_filenames=["config.yaml"]):
         self.watching_folder = watching_folder
         self.config_filenames = config_filenames
         self.event_handler = ConfigFileHandler(watching_folder,config_filenames)
@@ -52,7 +52,7 @@ class ConfigFileHandler(FileSystemEventHandler):
             return {}
 
     def on_modified(self, event):
-        file_name = os.path.split(event.src_path)[1]
+        file_name = os.path.basename(event.src_path)
         #文件发生更改时，检测前后两次文件的配置是否一致，如果不一致，则重启程序
         if file_name in self.config_filenames:
             yaml_data = self.read_config(event.src_path)
@@ -60,12 +60,16 @@ class ConfigFileHandler(FileSystemEventHandler):
             if last_yaml_data != yaml_data:
                 print_message(f'监测到配置文件发生更改,即将重启程序')
                 self.config_dict[file_name] = yaml_data
-                restart_program()
+                send_restart_signal(["start_watching",
+                                     "start_observer",
+                                     "start_sync_scheduled",
+                                     "sync_new_list",
+                                     "start_backup_scheduled"])
 
 if __name__ == "__main__":
     working_directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(working_directory)
     watching_folder = "./config"
-    config_filenames = ["config.yaml", "last_sync.yaml"]  # Replace with your actual config file paths
+    config_filenames = ["config.yaml"]  # Replace with your actual config file paths
     watcher = ConfigFileWatcher(watching_folder, config_filenames)
     watcher.start_watching()

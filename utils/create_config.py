@@ -3,15 +3,17 @@ import shutil
 from utils.shentools import *
 
 def check_config():
-    print_message('开始初始化配置文件...')
-    if not os.path.exists('./config/config.yaml'):
-        create_config_yaml()
-        print_message('初始化配置文件成功:config.yaml')
-    if not os.path.exists('./config/last_sync.yaml'):
-        create_last_sync_yaml()
-        print_message('初始化配置文件成功:last_sync.yaml')
-
-
+  print_message('开始检查配置文件...')
+  if not os.path.exists('./config/config.yaml') and not os.path.exists('./config/last_sync.yaml'):
+      print_message('当前目录不存在配置文件,开始初始化配置文件...')
+  if not os.path.exists('./config/config.yaml'):
+      print_message('开始初始化配置文件:config.yaml...')
+      create_config_yaml()
+      print_message('初始化配置文件成功:config.yaml')
+  if not os.path.exists('./config/last_sync.yaml'):
+      print_message('开始初始化配置文件:last_sync.yaml...')
+      create_last_sync_yaml()
+      print_message('初始化配置文件成功:last_sync.yaml')
 
 def create_config_yaml():
     content = '''#注:yaml文件很注重缩进,请不要随意删减空格,不确定的情况下请直接通过复制粘贴来添加同步目录
@@ -27,6 +29,9 @@ def create_config_yaml():
 #全同步状态:true为开启,false为关闭
 #全同步指的是,对指定目录进行完整同步
 
+#延时启动程序,防止程序比cd2先启动,单位为秒
+start_delay: 0
+
 #同步状态:true为开启,false为关闭
 sync_enabled: false
 
@@ -41,7 +46,17 @@ sync_scheduled: false
 #"30 12 * * *" => "30分 12时 每日 每月 周5"
 #如果想每天早上2点30运行,就写为#"30 2 * * *" 时间是24小时制
 #请参照上述的示例进行更改,不要通过在线生成工具生成cron表达式,程序可能无法识别
-sync_time: "3600"
+sync_time: "30 2 * * *"
+
+#定时备份本地目录:true为开启,false为关闭
+backup_scheduled: false
+
+#定时备份的时间间隔:单位为秒,支持乘法表达式,比如一天就是24*3600,意思是每隔指定的时间进行同步
+#支持cron表达式,只支持5位的cron表达式,cron表达式支持在每天指定的时间进行同步,cron表达式的格式如下
+#"30 12 * * *" => "30分 12时 每日 每月 周5"
+#如果想每天早上2点30运行,就写为#"30 2 * * *" 时间是24小时制
+#请参照上述的示例进行更改,不要通过在线生成工具生成cron表达式,程序可能无法识别
+backup_time: "30 2 * * *"
 
 #实时监控文件夹:true为开启,false为关闭
 observer_enabled: false
@@ -58,10 +73,10 @@ metadata_ext: ".nfo;.jpg;.png;.svg;.ass;.srt;.sup"
 
 #选择程序运行的优先级,数字越小越靠前
 func_order:
-  SymlinkCreator: 1
-  MetadataCopyer: 2
-  SymlinkDirChecker: 3
-  SymlinkChecker: 4
+  SymlinkDirChecker: 1
+  SymlinkChecker: 2
+  SymlinkCreator: 3
+  MetadataCopyer: 4
 
 #全局设置结束
 
@@ -92,22 +107,30 @@ sync_list:
     #两种模式可以自己测试一下，选择适合自己的模式
     observer_mode: "compatibility"
 
+    #定时备份本地目录:true为开启,false为关闭
+    backup_scheduled: true
+
+    #定时备份指定后缀名的文件,以;隔开如果想要备份所有格式的文件,就填*
+    #如只想备份元数据,则填:".nfo;.jpg;.png;.svg;.ass;.srt;.sup"
+    backup_ext: "*"
+
     #本地链接模式
     #symlink:软链接模式,创建视频软链接,和windows中的快捷方式一样
     #strm:strm文件模式，创建包含网盘视频播放地址的文件,优点在于直接访问视频的原始地址,emby扫库会更快
     symlink_mode: "symlink"
 
     #下面是strm模式才需要填写的内容,如果不用strm模式可以不填
+    #你的cd2/alist的网址,不要加http,推荐写具体的ip:端口号,如192.168.9.89:19798
+    cloud_url: ""
+    #填cd2/alist
+    cloud_type: ""
+
     #clouddrive2的挂载根目录
     #比如/volume1/CloudNAS/CloudDrive2/115对应的挂载根目录就是/volume1/CloudNAS/CloudDrive2
     clouddrive2_path: ""
 
-    #alist的挂载路径
+    #alist的挂载根目录
     alist_path: ""
-    #不要加http,推荐写具体的ip:19798,如192.168.9.89:19798
-    cloud_url: ""
-    #填cd2/alist
-    cloud_type: ""
 
     #开始同步的时候是否运行下面的程序,true为运行,false为不运行,如果不需要从网盘同步元数据到本地,则metadata_copyer设为false
     #清除无效文件夹

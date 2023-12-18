@@ -10,7 +10,7 @@ from utils.shentools import *
 
 
 class SymlinkCreator:
-    def __init__(self, source_folder, target_folder,allowed_extensions,symlink_mode="symlink",cloud_type=None,cloud_root_path=None,cloud_url=None, num_threads=8):
+    def __init__(self,source_folder, target_folder,allowed_extensions,symlink_mode="symlink",cloud_type=None,cloud_root_path=None,cloud_url=None, num_threads=8):
         self.source_folder = source_folder
         self.target_folder = target_folder
         self.allowed_extensions = allowed_extensions
@@ -94,7 +94,7 @@ class SymlinkCreator:
                 with open(strm_path, 'w') as f:
                     f.write(target_file)
                 self.created_links += 1
-                print_message(f"线程 {thread_name}::::{source_file} => {strm_path}")
+                print_message(f"线程 {thread_name}::: {source_file} => {strm_path}")
             except Exception as e:
                 print_message(f"创建strm文件失败:{source_file}")
                 print_message(f"error:{e}")

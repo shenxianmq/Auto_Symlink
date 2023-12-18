@@ -6,7 +6,8 @@ import requests
 from utils.shentools import *
 
 class SymlinkChecker:
-    def __init__(self, target_directory,symlink_mode,num_threads=4):
+    def __init__(self,cloud_path,target_directory,symlink_mode,num_threads=4):
+        self.cloud_path = cloud_path
         self.target_directory = target_directory
         self.symlink_mode = symlink_mode
         self.num_threads = num_threads
@@ -20,7 +21,8 @@ class SymlinkChecker:
         try:
             if os.path.islink(link):
                 target = os.readlink(link)
-                if not os.path.exists(target):
+                #必须在cloud_path存在的情况下才会删除
+                if os.path.exists(self.cloud_path) and not os.path.exists(target):
                     os.remove(link)
                     print_message(f"已删除无效{self.symlink_name}: {link}")
                     # logging.info(f"已删除无效{self.symlink_name}: {link}")
@@ -28,7 +30,7 @@ class SymlinkChecker:
             #如果是strm文件,则读取文件内的链接,判断返回的状态码
             else:
                 strm_in_use = self.check_strm(link)
-                if not strm_in_use:
+                if os.path.exists(self.cloud_path) and  not strm_in_use:
                     print_message(f"已删除无效{self.symlink_name}:{link}")
                     os.remove(link)
                     self.broken_num += 1

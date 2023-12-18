@@ -10,6 +10,9 @@ COPY . /app
 # 安装依赖
 RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --no-cache-dir -r requirements.txt
 
+# 安装 rsync
+RUN apt-get update && apt-get install -y rsync
+
 # 设置环境变量
 ENV PYTHONUNBUFFERED 1
 

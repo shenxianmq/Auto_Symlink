@@ -2,6 +2,7 @@ import os
 import shutil
 from pathlib import Path
 import time
+from utils.shentools import print_message,send_restart_signal
 import yaml
 import urllib.parse
 from typing import Any
@@ -15,9 +16,10 @@ class FileMonitorHandler(FileSystemEventHandler):
     目录监控响应类
     """
 
-    def __init__(self, watching_path: str, file_change: Any, **kwargs):
+    def __init__(self, watching_path: str,cloud_path,file_change: Any, **kwargs):
         super(FileMonitorHandler, self).__init__(**kwargs)
-        self._watch_path = watching_path
+        self._watching_path = watching_path
+        self._cloud_path = cloud_path
         self.file_change = file_change
 
     def on_any_event(self, event):
@@ -25,18 +27,26 @@ class FileMonitorHandler(FileSystemEventHandler):
 
     def on_created(self, event):
         print_message(f"目录监控created事件路径::: {event.src_path}")
-        self.file_change.event_handler(event=event, source_dir=self._watch_path, event_path=event.src_path)
+        if not os.path.exists(self._cloud_path):
+            while not os.path.exists(self._cloud_path):
+                print_message(f"没有检测到云端挂载目录,请检查目录挂载情况::: {self._cloud_path}")
+                time.sleep(3)
+            print_message(f"成功检测到云端挂载目录,即将重新启动目录监控")
+            send_restart_signal(['start_observer'])
+        self.file_change.event_handler(event=event, source_dir=self._watching_path, event_path=event.src_path)
 
     def on_deleted(self, event):
         print_message(f"目录监控deleted事件路径 src_path::: {event.src_path}")
-        self.file_change.event_handler(event=event,source_dir=self._watch_path, event_path=event.src_path)
+        if not os.path.exists(self._cloud_path):
+            while not os.path.exists(self._cloud_path):
+                print_message(f"没有检测到云端挂载目录,请检查目录挂载情况::: {self._cloud_path}")
+                time.sleep(3)
+            print_message(f"成功检测到云端挂载目录,即将重新启动目录监控")
+            send_restart_signal(['start_observer'])
+        self.file_change.event_handler(event=event,source_dir=self._watching_path, event_path=event.src_path)
 
     def on_moved(self, event):
         pass
-        # print_message(f"目录监控moved事件路径 src_path::: {event.src_path}")
-        # print_message(f"目录监控moved事件路径 dest_path::: {event.dest_path}")
-        # print_message("fast模式能触发，暂不处理")
-        # self.file_change.event_handler(event=event, source_dir=self._watch_path, event_path=event.dest_path)
 
 class FileMonitor:
     #直接创建在类下面就是类属性，哪怕新建不同的实例，照样能共享这些数据
@@ -69,7 +79,9 @@ class FileMonitor:
         self._alist_path = {}
         self._cloud_url = {}
         self._cloud_type = {}
+        self._observer = {}
         self.config_path = './config/config.yaml'
+        #从配置文件中获取相关参数
         self.add_monitor_conf(sync_list)
 
     def start(self):
@@ -82,34 +94,36 @@ class FileMonitor:
         timeout = 10
         for source_dir in self._symlink_dir.keys():
             if not self._observer_enabled.get(source_dir):
-                print_message(f'目录未处于监控状态：{source_dir}。若要启用，请在config.yaml的sync_list中将"observer_enabled"设置为"true"')
+                print_message(f'目录未处于监控状态::: {source_dir}。若要启用，请在config.yaml的sync_list中将"observer_enabled"设置为"true"')
                 continue
 
             cloud_path = self._cloud_path.get(source_dir)
             if not os.path.exists(cloud_path):
-                print_message(f"挂载目录不存在，请检查挂载状态：{cloud_path}")
+                print_message(f"挂载目录不存在，请检查挂载状态::: {cloud_path}")
                 continue
 
             monitoring_mode = self._observer_mode.get(source_dir)
+            cloud_path = self._cloud_path.get(source_dir)
             observer = PollingObserver(timeout=timeout) if str(monitoring_mode) == "compatibility" else Observer(timeout=timeout)
-
-            observer.schedule(event_handler=FileMonitorHandler(str(source_dir), self),
+            observer.schedule(event_handler=FileMonitorHandler(str(source_dir),cloud_path,self),
                               path=str(source_dir),
                               recursive=True)
-            print_message(f"开始监控文件夹：{str(source_dir)} 转移方式：{str(monitoring_mode)}")
+            print_message(f"开始监控文件夹::: {str(source_dir)} 转移方式::: {str(monitoring_mode)}")
+            self._observer[source_dir] = observer
             observer.daemon = True
             try:
                 observer.start()
             except ConnectionAbortedError:
-                print_message('监控程序发生错误。正在重新启动...')
-                restart_program()
+                print_message(f'监控程序发生错误。重新启动目录监控::: {source_dir}')
+                observer.stop()
+                send_restart_signal(['start_observer'])
 
     def add_monitor_conf(self,monitor_confs: list):
         # 存储目录监控配置
         for monitor_conf in monitor_confs:
             source_dir = monitor_conf.get("media_dir")
             if not source_dir:
-                print_message(f'目录不存在，请检查目录位置:{monitor_conf}')
+                print_message(f'目录不存在，请检查目录位置::: {monitor_conf}')
                 return
             self._symlink_dir[source_dir] = monitor_conf.get("symlink_dir")
             self._observer_mode[source_dir] = monitor_conf.get("observer_mode","compatibility")
@@ -133,17 +147,6 @@ class FileMonitor:
         :param source_dir:
         :param event_path:
         """
-        cloud_path = self._cloud_path.get(source_dir)
-        #延时5秒,防止网盘发生重启或者是掉挂载的情况
-        time.sleep(1.5)
-        if not os.path.exists(cloud_path):
-            while True:
-                if not os.path.exists(cloud_path):
-                    print_message(f"没有检测到云端挂载目录,请检查目录挂载情况:{cloud_path}")
-                    time.sleep(3)
-                else:
-                    print_message(f"成功检测到云端挂载目录,程序即将重启,若未成功重启请手动重启容器:{cloud_path}")
-                    restart_program()
         # 回收站及隐藏的文件不处理
         if (event_path.find("/@Recycle") != -1
                 or event_path.find("/#recycle") != -1
@@ -161,8 +164,8 @@ class FileMonitor:
             if  os.path.exists(event_path):
                 self.event_handler_created(event, event_path, source_dir)
             else:
-                print_message(f"同步出错,该文件并不存在,程序即将重启::: {event_path}")
-                restart_program()
+                print_message(f"created事件出错::: 该文件并不存在,即将重新启动目录监控 => {event_path}")
+                send_restart_signal(['start_observer'])
         if event.event_type == "deleted":
             self.event_handler_deleted(event_path, source_dir)
 
@@ -191,7 +194,7 @@ class FileMonitor:
             else:
                 if event_path.lower().endswith(symlink_ext):
                     if not symlink_creator:
-                        print_message(f"创建软链接未开启，跳过创建")
+                        print_message(f"创建软链接/strm文件未开启，跳过创建::: {event_path}")
                     else:
                         # 创建软链接
                         if self._symlink_mode == "symlink":
@@ -207,7 +210,7 @@ class FileMonitor:
                                                     cloud_url=cloud_url)
                 elif event_path.lower().endswith(metadata_ext):
                     if not metadata_copyer:
-                        print_message(f"元数据处理未开，跳过处理: {event_path} ")
+                        print_message(f"元数据处理未开，跳过处理::: {event_path} ")
                         return
                     self.__media_copyer(source_dir=source_dir,
                                                 target_dir=symlink_dir,
@@ -216,16 +219,8 @@ class FileMonitor:
             print_message(f"event_handler_created error: {e}")
 
     def event_handler_deleted(self, event_path: str, source_dir: str):
-        cloud_path = self._cloud_path.get(source_dir)
+        # cloud_path = self._cloud_path.get(source_dir)
         symlink_mode = self._symlink_mode.get(source_dir)
-        if not os.path.exists(cloud_path):
-            while True:
-                if not os.path.exists(cloud_path):
-                    print_message(f"没有检测到云端挂载目录,请检查目录挂载情况:{cloud_path}")
-                    time.sleep(3)
-                else:
-                    print_message(f"成功检测到云端挂载目录,程序即将重启,若未成功重启请手动重启容器:{cloud_path}")
-                    restart_program()
         dest_dir = self._symlink_dir.get(source_dir)
         #如果是strm模式,并且是指定的视频后缀就替换为.strm后缀
         if symlink_mode == "strm" and event_path.lower().endswith(self._symlink_ext.get(source_dir)):
@@ -239,8 +234,8 @@ class FileMonitor:
         if os.path.exists(event_path):
             print_message(f"源路径存在，跳过删除::: {deleted_target_path}")
             print_message("原因为可能快速重启了挂载工具(如CloudDrive2)")
-            print_message("为了本地数据安全，即将重启程序...")
-            restart_program()
+            print_message("为了本地数据安全，即将重启目录监控::: {source_dir}")
+            send_restart_signal(['start_observer'])
         #只删除存在的软链接或都路径
         if not deleted_path.is_symlink() and not deleted_path.exists():
             print_message(f"目标路径不存在，跳过删除::: {deleted_target_path}")
@@ -270,9 +265,9 @@ class FileMonitor:
         ):
             try:
                 parent_dir.rmdir()
-                print_message(f"删除空的父文件夹: {parent_dir}")
+                print_message(f"删除空的父文件夹::: {parent_dir}")
             except OSError as e:
-                print_message(f"删除空父目录失败: {e}")
+                print_message(f"删除空父目录失败::: {e}")
 
     @staticmethod
     def __create_symlink(source_dir: str, target_dir: str, source_file: str):
@@ -285,7 +280,7 @@ class FileMonitor:
             # 确保目标文件夹存在，如果不存在则创建
             os.makedirs(os.path.dirname(target_file), exist_ok=True)
             if os.path.exists(target_file):
-                print_message(f"软链接已存在，跳过:{target_file}")
+                print_message(f"软链接已存在，跳过::: {target_file}")
             else:
                 os.symlink(source_file, target_file)
         except Exception as e:
@@ -306,17 +301,17 @@ class FileMonitor:
                 if source_timestamp > target_timestamp:
                     os.makedirs(os.path.dirname(target_file), exist_ok=True)
                     shutil.copy2(source_file, target_file)
-                    print_message(f"成功复制元数据: {source_file} 到 {target_file}")
+                    print_message(f"成功复制元数据::: {source_file} 到 {target_file}")
                 else:
-                    print_message(f"元数据已存在，跳过:{target_file}")
+                    print_message(f"元数据已存在，跳过::: {target_file}")
             else:
                 os.makedirs(os.path.dirname(target_file), exist_ok=True)
                 shutil.copy2(source_file, target_file)
                 print_message(f"成功复制元数据: {source_file} 到 {target_file}")
 
         except Exception as e:
-            print_message(f'复制元数据失败:{source_file} 到 {target_file}')
-            print_message(f'error:{e}')
+            print_message(f'复制元数据失败::: {source_file} 到 {target_file}')
+            print_message(f'error::: {e}')
 
     @staticmethod
     def __create_strm_file(source_dir: str,
@@ -359,10 +354,10 @@ class FileMonitor:
             with open(strm_path, 'w') as f:
                 f.write(target_file)
 
-            print_message(f"成功创建strm文件:::{source_file} => {strm_path}")
+            print_message(f"成功创建strm文件::: {source_file} => {strm_path}")
         except Exception as e:
-            print_message(f"创建strm文件失败:{source_file}")
-            print_message(f"error:{e}")
+            print_message(f"创建strm文件失败::: {source_file}")
+            print_message(f"error::: {e}")
 
     @staticmethod
     def __parse_extensions(extensions_str: str):
@@ -376,16 +371,16 @@ class FileMonitor:
 
 def read_config(config_path):
     try:
-        with open(config_path, 'r', encoding='utf-8') as file:
+        with open(config_path, 'r') as file:
             data = yaml.safe_load(file)
         return data
     except Exception as e:
-        print_message(f"配置文件出现问题: {e}")
+        print_message(f"配置文件出现问题::: {e}")
         return None
 
 if __name__ == '__main__':
     working_directory = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(working_directory)
+    os.chdir("/Users/shenxian/PycharmProjects/Auto_Symlink")
     yaml_data = read_config('./config/config.yaml')
     sync_list = yaml_data.get('sync_list')
     FileMonitor(sync_list).start()

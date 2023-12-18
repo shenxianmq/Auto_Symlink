@@ -8,7 +8,8 @@ from utils.shentools import *
 
 
 class SymlinkDirChecker:
-    def __init__(self, source_root, target_root, num_threads=8, timeout_seconds=300):
+    def __init__(self, cloud_path,source_root, target_root, num_threads=8, timeout_seconds=300):
+        self.cloud_path = cloud_path
         self.source_root = source_root
         self.target_root = target_root
         self.num_threads = num_threads
@@ -22,12 +23,11 @@ class SymlinkDirChecker:
             dir_path = self.file_queue.get()
             if dir_path is None:
                 break
-
             try:
                 relative_path = os.path.relpath(dir_path, self.source_root)
                 target_dir = os.path.join(self.target_root, relative_path)
                 self.total_num += 1
-                if not os.path.exists(target_dir):
+                if os.path.exists(self.cloud_path) and not os.path.exists(target_dir):
                     self.error_dirs_num += 1
                     shutil.rmtree(dir_path)
                     print_message(f"线程 {thread_name}: 删除失效文件夹 => {dir_path}")
