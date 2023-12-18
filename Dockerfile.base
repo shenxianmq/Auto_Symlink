@@ -4,12 +4,11 @@ FROM python:3.11-slim-bookworm
 # 设置工作目录
 WORKDIR /app
 
-# 将当前目录下的所有文件复制到工作目录
-COPY . /app
+# 复制 requirements.txt 到工作目录
+COPY requirements.txt /app/
 
-# 安装依赖
-# RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# 安装依赖并删除 requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt && rm requirements.txt
 
 # 安装 rsync
 RUN apt-get update && apt-get install -y rsync
