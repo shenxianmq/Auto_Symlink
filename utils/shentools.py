@@ -144,7 +144,6 @@ def send_restart_signal(method_list=[]):
         method_list = []
     yaml_dump(yaml_path='./config/restart.yaml',data=method_list)
 
-
 def restart_program():
     script_path = sys.argv[0]
     print(sys.executable, sys.executable, script_path, *sys.argv[1:])
