@@ -110,7 +110,7 @@ sync_list:
     #定时备份本地目录:true为开启,false为关闭
     backup_scheduled: true
 
-    #定时备份指定后缀名的文件,以;隔开如果想要备份所有格式的文件,就填*
+    #定时备份指定后缀名的文件,以;隔开如果想要备份所有格式的文件,就填"*"
     #如只想备份元数据,则填:".nfo;.jpg;.png;.svg;.ass;.srt;.sup"
     backup_ext: "*"
 

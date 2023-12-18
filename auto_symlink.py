@@ -191,8 +191,8 @@ class AutoSync:
             #等待进程结束，并获取输出
             stdout, stderr = process.communicate()
             process.wait()
-            print_message(stdout)
             print_message(f'备份成功::: {source_dir} => {target_dir}')
+            print_backup_message(stdout)
 
     def restore_backup(self,source_dir,backup_dir):
         command = get_rsync_command (backup_dir,source_dir,'*')

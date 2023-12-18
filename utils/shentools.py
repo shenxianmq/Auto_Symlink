@@ -18,6 +18,33 @@ def print_message(message):
     # print(f"{timestamp}{message}")
     logging.info(message)
 
+def print_backup_message(output_text):
+    # 使用正则表达式提取数字部分
+    match = re.search(r'sent (.*?) bytes  received (.*?) bytes  (.*?) bytes/sec\n'
+                      r'total size is (.*?)  speedup', output_text)
+
+    if match:
+        sent_bytes = int(match.group(1).replace(',',''))
+        received_bytes = int(match.group(2).replace(',',''))
+        bytes_per_sec = float(match.group(3).replace(',', ''))
+        total_size = float(match.group(4).replace(',',''))
+
+        # 转换为MB
+        sent_mb = sent_bytes / (1024 * 1024)
+        speed_mb = bytes_per_sec / (1024*1024)
+        received_mb = received_bytes / (1024 * 1024)
+        total_size_mb = total_size / (1024 * 1024)
+
+        result = {
+            'sent_mb': sent_mb,
+            'received_mb': received_mb,
+            'speed_mb': speed_mb,
+            'total_size_mb': total_size_mb
+        }
+    if result:
+        print_message(f"增量备份文件大小::: {result['sent_mb']:.2f} MB")
+        print_message(f"备份文件速度::: {result['speed_mb']:.2f} MB/s")
+        print_message(f"备份文件总大小::: {result['total_size_mb']:.2f} MB")
 
 def get_uuid():
     random_uuid = str(uuid.uuid4())
@@ -45,11 +72,10 @@ def read_last_sync_config(config_path="./config/last_sync.yaml"):
         print_message(f"配置文件出现问题:{e}")
         return []
 
-
 def read_backup_list(config_path="./config/backup_list.yaml"):
     if not os.path.exists(config_path):
         with open(config_path, 'w') as file:
-            yaml.dump('{}', file, default_flow_style=False, allow_unicode=True)
+            yaml.dump({}, file, default_flow_style=False, allow_unicode=True)
     try:
         with open(config_path, 'r') as file:
             data = yaml.safe_load(file)

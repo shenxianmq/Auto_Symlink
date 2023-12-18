@@ -10,8 +10,9 @@ services:
       - 8095:8095
     volumes:
       - /volume1/CloudNAS:/volume1/CloudNAS:rslave
-      - /volume2/Media:/Media
+      - /volume2/Media:/volume2/Media
       - /volume1/docker/auto_symlink/config:/app/config
+      - /volume1/docker/auto_symlink/backup:/app/backup
     restart: unless-stopped
     logging:
       options:

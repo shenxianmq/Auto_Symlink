@@ -10,16 +10,14 @@ class_dict = {'AutoSync':AutoSync,
 
 def task_run(class_name, method_name):
     if class_name in class_dict:
-        try:
-            # 通过类名获取类
-            class_ = class_dict[class_name]
-            # 创建类的实例
-            instance = class_()
-            # 获取并调用指定方法
-            method = getattr(instance, method_name)
-            method()
-        except Exception as e:
-            print(f"An error occurred: {e}")
+        # 通过类名获取类
+        class_ = class_dict[class_name]
+        # 创建类的实例
+        instance = class_()
+        # 获取并调用指定方法
+        method = getattr(instance, method_name)
+        #不用try方法,这样能看到完整的报错信息
+        method()
     else:
         print(f"Class not found: {class_name}")
 
