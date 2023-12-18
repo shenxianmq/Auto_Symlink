@@ -151,7 +151,7 @@ class AutoSync:
             message = get_scheduled_time(cron,action=action)[1]
             print_message(f'定时{action}::: {message}')
             try:
-                self._scheduler.add_job(func=self.start_backup,
+                self._scheduler.add_job(func=func,
                                         args=[sync_list],
                                         trigger=CronTrigger.from_crontab(cron))
                 self._scheduler.start()
