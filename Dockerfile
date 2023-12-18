@@ -17,7 +17,6 @@ ENV PYTHONUNBUFFERED 1
 # 赋予脚本执行权限
 RUN chmod +x /app/start.sh
 RUN chmod +x /app/run.py
-RUN chmod +x /app/restart_sync.py
 RUN chmod +x /app/web.py
 
 # 定义容器启动命令
