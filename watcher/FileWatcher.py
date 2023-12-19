@@ -221,6 +221,13 @@ class FileMonitor:
 
     def event_handler_deleted(self, event_path: str, source_dir: str):
         # cloud_path = self._cloud_path.get(source_dir)
+        if event_path == "source_dir":
+            print_message('检测到media_dir删除事件,可能发生掉盘事件')
+            print_message("为了本地数据安全，即将重启目录监控::: {source_dir}")
+            send_restart_signal(['start_observer'])
+            #添加while循环阻塞线程,确保先重启
+            while True:
+                time.sleep(1)
         symlink_mode = self._symlink_mode.get(source_dir)
         dest_dir = self._symlink_dir.get(source_dir)
         #如果是strm模式,并且是指定的视频后缀就替换为.strm后缀
@@ -237,6 +244,8 @@ class FileMonitor:
             print_message("原因为可能快速重启了挂载工具(如CloudDrive2)")
             print_message("为了本地数据安全，即将重启目录监控::: {source_dir}")
             send_restart_signal(['start_observer'])
+            while True:
+                time.sleep(1)
         #只删除存在的软链接或都路径
         if not deleted_path.is_symlink() and not deleted_path.exists():
             print_message(f"目标路径不存在，跳过删除::: {deleted_target_path}")
