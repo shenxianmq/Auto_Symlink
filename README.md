@@ -112,6 +112,7 @@ tips：注意不要将`sync_list:`一起复制进去了，否则会只有一个�
 **如果你觉得这个项目对你有帮助，可以考虑赞助我。你的支持将有助于这个项目的持续发展和改进。谢谢你的考虑！🙏**
 
 微信:
+
 <img alt="Snipaste_2023-12-19_14-15-09" src="https://github.com/shenxianmq/Auto_Symlink/assets/76782947/77a14e36-c6dd-4ee8-ae86-f031fb50ffc0" width="30%">
 
 支付宝:
