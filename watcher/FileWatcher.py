@@ -2,7 +2,6 @@ import os
 import shutil
 from pathlib import Path
 import time
-from utils.shentools import print_message,send_restart_signal
 import yaml
 import urllib.parse
 from typing import Any
@@ -197,17 +196,19 @@ class FileMonitor:
                         print_message(f"创建软链接/strm文件未开启，跳过创建::: {event_path}")
                     else:
                         # 创建软链接
-                        if self._symlink_mode == "symlink":
+                        if self._symlink_mode.get(source_dir) == "symlink":
                             self.__create_symlink(source_dir=source_dir,
                                                     target_dir=symlink_dir,
                                                     source_file=event_path)
-                        elif self._symlink_mode == "strm":
+                        elif self._symlink_mode.get(source_dir) == "strm":
                             self.__create_strm_file(source_dir=source_dir,
                                                     target_dir=symlink_dir,
                                                     source_file=event_path,
                                                     cloud_type=cloud_type,
                                                     cloud_path=cloud_root_path,
                                                     cloud_url=cloud_url)
+                        else:
+                            print_message(f"当前目录symlink_mode配置错误:{self._symlink_mode}")
                 elif event_path.lower().endswith(metadata_ext):
                     if not metadata_copyer:
                         print_message(f"元数据处理未开，跳过处理::: {event_path} ")
@@ -283,9 +284,9 @@ class FileMonitor:
                 print_message(f"软链接已存在，跳过::: {target_file}")
             else:
                 os.symlink(source_file, target_file)
+                print_message(f"成功创建软链接::: {source_file} => {target_file}")
         except Exception as e:
-            print_message(f"创建软链接失败")
-            print_message(str(e))
+            print_message(f"创建软链接失败::: {e}")
 
     @staticmethod
     def __media_copyer(source_dir: str, target_dir: str, source_file:str):
@@ -353,7 +354,6 @@ class FileMonitor:
             # 写入.strm文件
             with open(strm_path, 'w') as f:
                 f.write(target_file)
-
             print_message(f"成功创建strm文件::: {source_file} => {strm_path}")
         except Exception as e:
             print_message(f"创建strm文件失败::: {source_file}")
