@@ -43,6 +43,8 @@ if __name__ == '__main__':
     monitor_file_path = './config/restart.yaml'
     if os.path.exists(monitor_file_path):
         os.remove(monitor_file_path)
+    if not os.path.exists('./config'):
+        os.mkdir('./config')
     configure_logging(log_file='./config/auto_symlink.log', max_log_size_bytes=10 * 1024 * 1024, date_format='%Y-%m-%d %H:%M:%S')
     check_config()
     # 启动四个不同的 Python 文件作为独立的进程

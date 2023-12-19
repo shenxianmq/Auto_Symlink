@@ -165,6 +165,8 @@ class FileMonitor:
             else:
                 print_message(f"created事件出错::: 该文件并不存在,即将重新启动目录监控 => {event_path}")
                 send_restart_signal(['start_observer'])
+                while True:
+                    time.sleep(1)
         if event.event_type == "deleted":
             self.event_handler_deleted(event_path, source_dir)
 
@@ -221,9 +223,9 @@ class FileMonitor:
 
     def event_handler_deleted(self, event_path: str, source_dir: str):
         # cloud_path = self._cloud_path.get(source_dir)
-        if event_path == "source_dir":
+        if event_path == source_dir:
             print_message('检测到media_dir删除事件,可能发生掉盘事件')
-            print_message("为了本地数据安全，即将重启目录监控::: {source_dir}")
+            print_message("为了本地数据安全，即将重启目录监控")
             send_restart_signal(['start_observer'])
             #添加while循环阻塞线程,确保先重启
             while True:

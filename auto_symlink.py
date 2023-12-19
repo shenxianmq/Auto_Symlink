@@ -1,4 +1,5 @@
 import os
+import time
 import subprocess
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -186,13 +187,25 @@ class AutoSync:
                 backup_list[source_dir] = target_dir
                 save_backup_list(data=backup_list)
             print_message(f'开始备份目录::: {source_dir} => {target_dir}')
+            start_time = time.time()
             command = get_rsync_command (source_dir,target_dir,backup_ext)
             process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             #等待进程结束，并获取输出
-            stdout, stderr = process.communicate()
-            process.wait()
+            try:
+                stdout, stderr = process.communicate()
+                stdout = stdout.decode('utf-8', 'ignore')
+                stderr = stderr.decode('utf-8', 'ignore')
+            except UnicodeDecodeError as e:
+                stdout = ""
+                print(f"Error decoding output: {e}")
+            end_time = time.time()
+            total_time = start_time - end_time
+            if total_time <= 0:
+                total_time = 0.5
             print_message(f'备份成功::: {source_dir} => {target_dir}')
-            print_backup_message(stdout)
+            print(f"总耗时: {total_time:.2f} 秒")
+            if stdout:
+                print_backup_message(stdout)
 
     def restore_backup(self,source_dir,backup_dir):
         command = get_rsync_command (backup_dir,source_dir,'*')
