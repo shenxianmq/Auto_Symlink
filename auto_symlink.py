@@ -193,11 +193,8 @@ class AutoSync:
             #等待进程结束，并获取输出
             try:
                 stdout, stderr = process.communicate()
-                stdout = stdout.decode('utf-8', 'ignore')
-                stderr = stderr.decode('utf-8', 'ignore')
             except UnicodeDecodeError as e:
                 stdout = ""
-                print(f"Error decoding output: {e}")
             end_time = time.time()
             total_time = start_time - end_time
             if total_time <= 0:
