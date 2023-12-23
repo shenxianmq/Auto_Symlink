@@ -9,6 +9,7 @@ from autosync.MetadataCopyer import MetadataCopyer
 from autosync.SymlinkCreator import SymlinkCreator
 from autosync.SymlinkChecker import SymlinkChecker
 from autosync.SymlinkDirChecker import SymlinkDirChecker
+from autosync.MedadataChecker import MetadadaChecker
 
 
 class AutoSync:
@@ -306,6 +307,7 @@ class AutoSync:
                 symlink_dir = dir_dict.get("symlink_dir", "")
                 symlink_dir_checker_flag = dir_dict.get("symlink_dir_checker", False)
                 symlink_checker_flag = dir_dict.get("symlink_checker", False)
+                metadata_checker_flag = dir_dict.get("metadata_checker", False)
                 symlink_creator_flag = dir_dict.get("symlink_creator", False)
                 metadata_copyer_flag = dir_dict.get("metadata_copyer", False)
                 symlink_mode = dir_dict.get("symlink_mode", "symlink")
@@ -362,6 +364,18 @@ class AutoSync:
                             num_threads,
                         )
                         cost_time, message = symlink_checker.run()
+                        total_time += cost_time
+                        message_list.append(message)
+
+                    if func_name == "MetadataChecker" and metadata_checker_flag:
+                        metadata_checker = MetadadaChecker(
+                            cloud_path,
+                            media_dir,
+                            symlink_dir,
+                            metadata_ext,
+                            num_threads,
+                        )
+                        cost_time, message = metadata_checker.run()
                         total_time += cost_time
                         message_list.append(message)
 
