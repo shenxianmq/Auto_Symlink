@@ -32,7 +32,7 @@ class SymlinkChecker:
                     # logging.info(f"已删除无效{self.symlink_name}: {link}")
                     self.broken_num += 1
             # 如果是strm文件,则读取文件内的链接,判断返回的状态码
-            else:
+            elif link.endswith("strm"):
                 strm_in_use = self.check_strm(link)
                 if os.path.exists(self.cloud_path) and not strm_in_use:
                     print_message(f"已删除无效{self.symlink_name}:{link}")
@@ -40,6 +40,15 @@ class SymlinkChecker:
                     self.broken_num += 1
                 # print_message(f"已跳过有效{self.symlink_name}: {link}")
                 pass
+            # 不是软链接也不是strm,文件，只能是无效视频了
+            else:
+                # 必须在cloud_path存在的情况下才会删除
+                if os.path.exists(self.cloud_path) and not os.path.exists(target):
+                    os.remove(link)
+                    print_message(f"已删除无效{self.symlink_name}: {link}")
+                    # logging.info(f"已删除无效{self.symlink_name}: {link}")
+                    self.broken_num += 1
+
         except Exception as e:
             print_message(f"检查{self.symlink_name}/strm文件时出错: {link}, 错误: {e}")
 

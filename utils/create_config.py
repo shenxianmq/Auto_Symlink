@@ -2,18 +2,22 @@ import os
 import shutil
 from utils.shentools import *
 
+
 def check_config():
-  print_message('开始检查配置文件...')
-  if not os.path.exists('./config/config.yaml') and not os.path.exists('./config/last_sync.yaml'):
-      print_message('当前目录不存在配置文件,开始初始化配置文件...')
-  if not os.path.exists('./config/config.yaml'):
-      print_message('开始初始化配置文件:config.yaml...')
-      create_config_yaml()
-      print_message('初始化配置文件成功:config.yaml')
-  if not os.path.exists('./config/last_sync.yaml'):
-      print_message('开始初始化配置文件:last_sync.yaml...')
-      create_last_sync_yaml()
-      print_message('初始化配置文件成功:last_sync.yaml')
+    print_message("开始检查配置文件...")
+    if not os.path.exists("./config/config.yaml") and not os.path.exists(
+        "./config/last_sync.yaml"
+    ):
+        print_message("当前目录不存在配置文件,开始初始化配置文件...")
+    if not os.path.exists("./config/config.yaml"):
+        print_message("开始初始化配置文件:config.yaml...")
+        create_config_yaml()
+        print_message("初始化配置文件成功:config.yaml")
+    if not os.path.exists("./config/last_sync.yaml"):
+        print_message("开始初始化配置文件:last_sync.yaml...")
+        create_last_sync_yaml()
+        print_message("初始化配置文件成功:last_sync.yaml")
+
 
 def create_config_yaml():
     content = '''#注:yaml文件很注重缩进,请不要随意删减空格,不确定的情况下请直接通过复制粘贴来添加同步目录
@@ -112,7 +116,7 @@ sync_list:
 
     #定时备份指定后缀名的文件,以;隔开如果想要备份所有格式的文件,就填"*"
     #如只想备份元数据,则填:".nfo;.jpg;.png;.svg;.ass;.srt;.sup"
-    backup_ext: "*"
+    backup_ext: "*.*"
 
     #本地链接模式
     #symlink:软链接模式,创建视频软链接,和windows中的快捷方式一样
@@ -147,16 +151,18 @@ sync_list:
     symlink_ext: ".mkv;.iso;.ts;.mp4;.avi;.rmvb;.wmv;.m2ts;.mpg;.flv;.rm;.mov"
     #元数据指定后缀名
     metadata_ext: ".nfo;.jpg;.png;.svg;.ass;.srt;.sup"'''
-    with open('./config/config.yaml','w',encoding='utf-8') as f:
+    with open("./config/config.yaml", "w", encoding="utf-8") as f:
         f.write(content)
+
 
 def create_last_sync_yaml():
     content = '''last_sync_list:
   - "/path/to/cloud_path"'''
-    with open('./config/last_sync.yaml','w',encoding='utf-8') as f:
+    with open("./config/last_sync.yaml", "w", encoding="utf-8") as f:
         f.write(content)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     working_directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(working_directory)
     create_config()

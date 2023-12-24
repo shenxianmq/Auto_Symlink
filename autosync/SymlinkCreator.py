@@ -3,6 +3,7 @@ import threading
 import time
 import queue
 import sys
+import shutil
 from pathlib import Path
 import urllib.parse
 from utils.shentools import *
@@ -15,6 +16,7 @@ class SymlinkCreator:
         target_folder,
         allowed_extensions,
         symlink_mode="symlink",
+        symlink_size=20,
         cloud_type=None,
         cloud_root_path=None,
         cloud_url=None,
@@ -24,6 +26,7 @@ class SymlinkCreator:
         self.target_folder = target_folder
         self.allowed_extensions = allowed_extensions
         self.symlink_mode = symlink_mode
+        self.symlink_size = symlink_size
         self.cloud_type = cloud_type
         self.cloud_root_path = cloud_root_path
         self.cloud_url = cloud_url
@@ -39,7 +42,11 @@ class SymlinkCreator:
                 self.existing_links += 1
                 # print_message(f"线程 {thread_name}: {self.symlink_name}已存在，跳过:{dst}")
                 return
-            os.symlink(src, dst)
+            file_size = os.path.getsize(src)
+            if file_size <= self.symlink_size * 1024 * 1024:
+                shutil.copy2(src, dst)
+            else:
+                os.symlink(src, dst)
             self.created_links += 1
             print_message(f"线程 {thread_name}: {src} => {dst}")
             # logging.info(f"线程 {thread_name}: {src} => {dst} ")

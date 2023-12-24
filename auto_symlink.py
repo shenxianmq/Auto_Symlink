@@ -20,29 +20,8 @@ class AutoSync:
     ):
         self.config_path = config_path
         self.last_sync_path = last_sync_path
-        self.symlink_ext = (
-            ".mkv",
-            ".iso",
-            ".ts",
-            ".mp4",
-            ".avi",
-            ".rmvb",
-            ".wmv",
-            ".m2ts",
-            ".mpg",
-            ".flv",
-            ".rm",
-            ".mov",
-        )
-        self.metadata_ext = (".nfo", ".jpg", ".png", ".svg", ".ass", ".srt", ".sup")
         self.yaml_data = read_config(config_path=config_path)
         self.last_sync_list = read_last_sync_config(config_path=last_sync_path)
-        self.symlink_ext = self.yaml_data.get(
-            "symlink_ext", ".mkv;.iso;.ts;.mp4;.avi;.rmvb;.wmv;.m2ts;.mpg;.flv;.rm;.mov"
-        )
-        self.metadata_ext = self.yaml_data.get(
-            "metadata_ext", ".nfo;.jpg;.png;.svg;.ass;.srt;.sup"
-        )
         self.func_list = sorted(
             self.yaml_data["func_order"], key=self.yaml_data["func_order"].get
         )
@@ -251,7 +230,7 @@ class AutoSync:
                 print_message(f"当前目录没有开始定时备份,跳过::: {backup_scheduled}")
             source_dir = item.get("symlink_dir", "")
             target_dir = backup_list.get(source_dir, "")
-            backup_ext = item.get("backup_ext", "*")
+            backup_ext = item.get("backup_ext", "*.*")
             if not backup_list or not target_dir:
                 folder_name = get_uuid()
                 target_dir = os.path.abspath(os.path.join("./backup", folder_name))
@@ -311,6 +290,7 @@ class AutoSync:
                 symlink_creator_flag = dir_dict.get("symlink_creator", False)
                 metadata_copyer_flag = dir_dict.get("metadata_copyer", False)
                 symlink_mode = dir_dict.get("symlink_mode", "symlink")
+                symlink_size = dir_dict.get("symlink_size", 20)
                 cloud_type = dir_dict.get("cloud_type", "symlink")
                 cloud_url = dir_dict.get("cloud_url", "")
                 symlink_mode = dir_dict.get("symlink_mode", "")
@@ -320,10 +300,13 @@ class AutoSync:
                 elif cloud_type == "alist":
                     cloud_root_path = dir_dict.get("alist_path", "")
                 symlink_ext = self.parse_extensions(
-                    dir_dict.get("symlink_ext", self.symlink_ext)
+                    dir_dict.get(
+                        "symlink_ext",
+                        ".mkv;.iso;.ts;.mp4;.avi;.rmvb;.wmv;.m2ts;.mpg;.flv;.rm;.mov",
+                    )
                 )
                 metadata_ext = self.parse_extensions(
-                    dir_dict.get("metadata_ext", self.metadata_ext)
+                    dir_dict.get("metadata_ext", ".nfo;.jpg;.png;.svg;.ass;.srt;.sup")
                 )
                 sync_enabled = dir_dict.get("sync_enabled", True)
                 if not sync_enabled:
@@ -385,6 +368,7 @@ class AutoSync:
                             symlink_dir,
                             symlink_ext,
                             symlink_mode,
+                            symlink_size,
                             cloud_type,
                             cloud_root_path,
                             cloud_url,

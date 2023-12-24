@@ -9,6 +9,8 @@ from utils.shentools import *
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 from watchdog.observers.polling import PollingObserver
+import platform
+import subprocess
 
 
 class FileMonitorHandler(FileSystemEventHandler):
@@ -23,7 +25,8 @@ class FileMonitorHandler(FileSystemEventHandler):
         self.file_change = file_change
 
     def on_any_event(self, event):
-        print_message(f"目录监控事件路径::: {event.src_path}")
+        # print_message(f"目录监控事件路径::: {event.src_path}")
+        # print(event.event_type)
         pass
 
     def on_created(self, event):
@@ -34,6 +37,8 @@ class FileMonitorHandler(FileSystemEventHandler):
                 time.sleep(3)
             print_message(f"成功检测到云端挂载目录,即将重新启动目录监控")
             send_restart_signal(["start_observer"])
+            time.sleep(1)
+            sys.exit()
         self.file_change.event_handler(
             event=event, source_dir=self._watching_path, event_path=event.src_path
         )
@@ -46,6 +51,8 @@ class FileMonitorHandler(FileSystemEventHandler):
                 time.sleep(3)
             print_message(f"成功检测到云端挂载目录,即将重新启动目录监控")
             send_restart_signal(["start_observer"])
+            time.sleep(1)
+            sys.exit()
         self.file_change.event_handler(
             event=event, source_dir=self._watching_path, event_path=event.src_path
         )
@@ -86,6 +93,8 @@ class FileMonitor:
         self._cloud_url = {}
         self._cloud_type = {}
         self._observer = {}
+        self._observer_time = {}
+        self._symlink_size = {}
         self.config_path = "./config/config.yaml"
         # 从配置文件中获取相关参数
         self.add_monitor_conf(sync_list)
@@ -97,7 +106,6 @@ class FileMonitor:
         if not self._symlink_dir or not self._symlink_dir.keys():
             raise ValueError("未找到目录监控配置，请检查配置文件。")
 
-        timeout = 10
         for source_dir in self._symlink_dir.keys():
             if not self._observer_enabled.get(source_dir):
                 print_message(
@@ -109,7 +117,7 @@ class FileMonitor:
             if not os.path.exists(cloud_path):
                 print_message(f"挂载目录不存在，请检查挂载状态::: {cloud_path}")
                 continue
-
+            timeout = self._observer_time.get(source_dir, 5)
             monitoring_mode = self._observer_mode.get(source_dir)
             cloud_path = self._cloud_path.get(source_dir)
             observer = (
@@ -133,6 +141,8 @@ class FileMonitor:
                 print_message(f"监控程序发生错误。重新启动目录监控::: {source_dir}")
                 observer.stop()
                 send_restart_signal(["start_observer"])
+                time.sleep(1)
+                sys.exit()
 
     def add_monitor_conf(self, monitor_confs: list):
         # 存储目录监控配置
@@ -145,6 +155,7 @@ class FileMonitor:
             self._observer_mode[source_dir] = monitor_conf.get(
                 "observer_mode", "compatibility"
             )
+            self._observer_time[source_dir] = monitor_conf.get("observer_time", 5)
             self._cloud_path[source_dir] = monitor_conf.get("cloud_path")
             self._symlink_ext[source_dir] = monitor_conf.get(
                 "symlink_ext",
@@ -164,6 +175,7 @@ class FileMonitor:
                 "observer_enabled", True
             )
             self._symlink_mode[source_dir] = monitor_conf.get("symlink_mode", "")
+            self._symlink_size = monitor_conf.get("symlink_size", 20)
             self._clouddrive2_path[source_dir] = monitor_conf.get(
                 "clouddrive2_path", ""
             )
@@ -198,8 +210,9 @@ class FileMonitor:
             else:
                 print_message(f"created事件出错::: 该文件并不存在,即将重新启动目录监控 => {event_path}")
                 send_restart_signal(["start_observer"])
-                while True:
-                    time.sleep(1)
+                time.sleep(1)
+                sys.exit()
+
         if event.event_type == "deleted":
             self.event_handler_deleted(event_path, source_dir)
 
@@ -230,6 +243,15 @@ class FileMonitor:
                     if not symlink_creator:
                         print_message(f"创建软链接/strm文件未开启，跳过创建::: {event_path}")
                     else:
+                        file_size = os.path.getsize(event_path)
+                        # 小于指定大小的视频直接复制
+                        if file_size <= self._symlink_size[source_dir] * 1024 * 1024:
+                            print_message(f"当前文件小于指定软链接文件大小,直接进行复制:{event_path}")
+                            self._metadata_copyer(
+                                source_dir=source_dir,
+                                target_dir=symlink_dir,
+                                source_file=event_path,
+                            )
                         # 创建软链接
                         if self._symlink_mode.get(source_dir) == "symlink":
                             self.__create_symlink(
@@ -260,6 +282,18 @@ class FileMonitor:
         except Exception as e:
             print_message(f"event_handler_created error: {e}")
 
+    def check_existence(self, input_path):
+        system = platform.system()
+        if system == "Windows":
+            command = f'dir "{input_path}"'  # 使用dir命令来检查文件或文件夹是否存在（Windows）
+        else:
+            command = f'ls "{input_path}"'  # 使用ls命令来检查文件或文件夹是否存在（Unix/Linux）
+        try:
+            subprocess.run(command, shell=True, check=True)
+            return True
+        except subprocess.CalledProcessError as e:
+            return False
+
     def event_handler_deleted(self, event_path: str, source_dir: str):
         # cloud_path = self._cloud_path.get(source_dir)
         if event_path == source_dir:
@@ -269,6 +303,7 @@ class FileMonitor:
             # 添加while循环阻塞线程,确保先重启
             while True:
                 time.sleep(1)
+                sys.exit()
         symlink_mode = self._symlink_mode.get(source_dir)
         dest_dir = self._symlink_dir.get(source_dir)
         # 如果是strm模式,并且是指定的视频后缀就替换为.strm后缀
@@ -282,6 +317,7 @@ class FileMonitor:
         else:
             deleted_target_path = event_path.replace(source_dir, dest_dir)
         deleted_path = Path(deleted_target_path)
+
         if os.path.exists(event_path):
             print_message(f"源路径存在，跳过删除::: {deleted_target_path}")
             print_message("原因为可能快速重启了挂载工具(如CloudDrive2)")
@@ -289,22 +325,26 @@ class FileMonitor:
             send_restart_signal(["start_observer"])
             while True:
                 time.sleep(1)
-        # 只删除存在的软链接或都路径
+
         if not deleted_path.is_symlink() and not deleted_path.exists():
             print_message(f"目标路径不存在，跳过删除::: {deleted_target_path}")
         else:
-            if deleted_path.is_symlink():
+            if deleted_path.is_symlink() and os.path.exists(
+                self._cloud_path[source_dir]
+            ):
                 # 如果是符号链接，直接删除
                 deleted_path.unlink()
                 print_message(f"成功删除软链接::: {deleted_target_path}")
-            elif deleted_path.is_file():
+            elif deleted_path.is_file() and os.path.exists(
+                self._cloud_path[source_dir]
+            ):
                 deleted_path.unlink()
                 print_message(f"成功删除文件::: {deleted_target_path}")
-            elif deleted_path.is_dir():
+            elif deleted_path.is_dir() and os.path.exists(self._cloud_path[source_dir]):
                 # 非根目录，才删除目录
                 shutil.rmtree(deleted_target_path)
                 print_message(f"成功删除目录::: {deleted_target_path}")
-        if event_path != source_dir:
+        if event_path != source_dir and os.path.dirname(event_path) != source_dir:
             self.__delete_empty_parent_directory(event_path)
 
     @staticmethod
