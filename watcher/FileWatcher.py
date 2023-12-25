@@ -175,7 +175,7 @@ class FileMonitor:
                 "observer_enabled", True
             )
             self._symlink_mode[source_dir] = monitor_conf.get("symlink_mode", "")
-            self._symlink_size = monitor_conf.get("symlink_size", 20)
+            self._symlink_size[source_dir] = monitor_conf.get("symlink_size", 20)
             self._clouddrive2_path[source_dir] = monitor_conf.get(
                 "clouddrive2_path", ""
             )
