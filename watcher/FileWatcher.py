@@ -25,9 +25,8 @@ class FileMonitorHandler(FileSystemEventHandler):
         self.file_change = file_change
 
     def on_any_event(self, event):
-        # print_message(f"目录监控事件路径::: {event.src_path}")
-        # print(event.event_type)
-        pass
+        if os.path.exists("./config/observer.txt"):
+            print(f"目录监控created事件路径::: {event.src_path}")
 
     def on_created(self, event):
         print_message(f"目录监控created事件路径::: {event.src_path}")
