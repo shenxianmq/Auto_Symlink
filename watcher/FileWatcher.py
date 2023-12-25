@@ -265,7 +265,7 @@ class FileMonitor:
                                 target_dir=symlink_dir,
                                 source_file=event_path,
                                 cloud_type=cloud_type,
-                                cloud_path=cloud_root_path,
+                                cloud_root_path=cloud_root_path,
                                 cloud_url=cloud_url,
                             )
                         else:
