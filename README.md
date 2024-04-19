@@ -1,5 +1,5 @@
 ### 交流群
-telegram: https://t.me/auto_symlink
+telegram: https://t.me/autosymlink_channel
 
 ### Auto_Symlink
 **如果你觉得这个项目对你有帮助，可以考虑赞助我。你的支持将有助于这个项目的持续发展和改进。谢谢你的考虑！🙏**
