@@ -157,7 +157,6 @@ https://zh.okaapps.com/support
 
 #### Q: 群晖创建容器rslave报错
 **答**: 在群晖的任务计划中添加开机任务： 
-
 mount --make-shared /volume1/ 
 mount --make-shared /volume2/ 
 systemctl daemon-reload 
