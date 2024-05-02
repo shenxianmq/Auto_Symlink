@@ -101,9 +101,8 @@ https://zh.okaapps.com/support
      -v /volume2/Media:/Media \
      -v /volume1/docker/auto_symlink/config:/app/config \
      -p 8095:8095 \
+     --user 1000:1000 \
      --restart unless-stopped \
-     --log-opt max-size=10m \
-     --log-opt max-file=3 \
      shenxianmq/auto_symlink:latest
    ```
    注意：映射网盘路径时必须使用绝对路径。
