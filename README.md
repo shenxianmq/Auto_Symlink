@@ -101,7 +101,7 @@ https://zh.okaapps.com/support
      -v /volume2/Media:/Media \
      -v /volume1/docker/auto_symlink/config:/app/config \
      -p 8095:8095 \
-     --user 1000:1000 \
+     --user 0:0 \
      --restart unless-stopped \
      shenxianmq/auto_symlink:latest
    ```
