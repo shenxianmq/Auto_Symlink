@@ -1,26 +1,6 @@
 ### 交流群
 telegram: https://t.me/autosymlink_channel
 
-### Auto_Symlink最佳搭配
-VidHub全能播放神器 支持 iOS & macOS & tvOS。
-⭐️ 主要功能：
-- 优雅管理本地或者网盘视频资源：阿里云盘，百度网盘，google drive，dropbox，one drive等官方接口直连。支持了alist转接各种网盘，夸克，115，pikpak，天翼云等，smb，webdav的nas访问
-- 自动抓取影视信息、自动分类、自动分季、分集展示
-- 支持倍速、截图、调色、在线字幕等等播放器众多功能
-- 支持 Emby，Jellyfin直连
-- 方便快速全局搜索
-- iCloud 云端同步
-- 支持直接文件源查看和操作，批量改名等
-- 支持映射播放HDR，杜比视界文件
-
-📢 AppStore搜索VidHub直接能下载
-
-🔗 下载地址
-https://apps.apple.com/app/apple-store/id1659622164?pt=122790787&mt=8&ct=linksys
-
-🆔 开发者信息
-https://zh.okaapps.com/support
-
 ### Auto_Symlink
 **如果你觉得这个项目对你有帮助，可以考虑赞助我。你的支持将有助于这个项目的持续发展和改进。谢谢你的考虑！🙏**
 
@@ -163,26 +143,25 @@ systemctl daemon-reload
 
 ---
 
-## 旧版(无GUI界面)解答 (FAQ)
-#### Q:配置文件只给出了一个目录映射，我想映射多个怎么办？
-**答**: 仅需将`sync_list:`后面的所有内容再复制一遍即可,注意空格,yaml文件格式很注意缩进。
-tips：注意不要将`sync_list:`一起复制进去了，否则会只有一个目录生效
+### Auto_Symlink最佳搭配
+VidHub全能播放神器 支持 iOS & macOS & tvOS。
+⭐️ 主要功能：
+- 优雅管理本地或者网盘视频资源：阿里云盘，百度网盘，google drive，dropbox，one drive等官方接口直连。支持了alist转接各种网盘，夸克，115，pikpak，天翼云等，smb，webdav的nas访问
+- 自动抓取影视信息、自动分类、自动分季、分集展示
+- 支持倍速、截图、调色、在线字幕等等播放器众多功能
+- 支持 Emby，Jellyfin直连
+- 方便快速全局搜索
+- iCloud 云端同步
+- 支持直接文件源查看和操作，批量改名等
+- 支持映射播放HDR，杜比视界文件
 
-#### Q: 配置文件修改每次都要重启吗？
-**答**: 不需要，本工具支持热重载。
+📢 AppStore搜索VidHub直接能下载
 
-#### Q: 我创建了docker，为什么启动软件后没有生效？
-**答**: 第一次启动仅仅会自动创建`config`配置文件，还需要进入`config`目录下编辑`config.yaml`文件，文件内有详细使用说明。
+🔗 下载地址
+https://apps.apple.com/app/apple-store/id1659622164?pt=122790787&mt=8&ct=linksys
 
-#### Q:我配置了多个目录，但只有一个目录生效了是怎么回事？
-**答**: 请检查目录配置中是否将`sync_list:`也一起复制进去了
-
----
-
-#### 配置文件说明
-- `config.yaml`: YAML 格式的主配置文件，详细配置可以参考文件中的注释。
-- `last_sync.yaml`: 保存已同步的目标目录，用于避免重复全同步。
----
+🆔 开发者信息
+https://zh.okaapps.com/support
 
 #### 开源许可
 本项目遵循 [LICENSE](LICENSE) 中所述的开源许可。
