@@ -16,7 +16,7 @@ telegram: https://t.me/autosymlink_channel
 **小白牙整理**
 
 ### 项目简介
-`Auto_Symlink` 是一个自动化工具，专门设计用于管理通过 CloudDrive2/Alist 挂载到本地的网盘。它能够创建软链接，使得像 Emby/Jellyfin 这样的媒体服务器能够更容易地刮削和读取内容，同时减少对网盘的频繁访问。
+`Auto_Symlink` 是一个自动化工具，专门设计用于管理通过 CloudDrive2/Alist 挂载到本地的网盘。它能够创建软链接，使得像 Emby/Jellyfin/Plex 这样的媒体服务器能够更容易地刮削和读取内容，同时减少对网盘的频繁访问。
 
 #### 主要特性:
 - **实时监控**: 需要CloudDrive2的会员功能**文件通知**,监控指定目录，自动进行必要的更新和管理。
