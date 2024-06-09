@@ -143,8 +143,11 @@ telegram: https://t.me/autosymlink_channel
 
 #### Q: 群晖创建容器rslave报错
 **答**: 在群晖的任务计划中添加开机任务： 
+
 mount --make-shared /volume1/ 
+
 mount --make-shared /volume2/ 
+
 systemctl daemon-reload 
 添加后手动运行一次，之后开机会自动运行
 
