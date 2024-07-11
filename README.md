@@ -151,28 +151,3 @@ systemctl daemon-reload
 支付宝:
 
 <img src="https://github.com/shenxianmq/Auto_Symlink/assets/76782947/ec8a3d7d-41ba-42d9-bec0-73bad0147ce2" alt="image" width="15%">
-
----
-
-### Auto_Symlink最佳搭配
-VidHub全能播放神器 支持 iOS & macOS & tvOS。
-⭐️ 主要功能：
-- 优雅管理本地或者网盘视频资源：阿里云盘，百度网盘，google drive，dropbox，one drive等官方接口直连。支持了alist转接各种网盘，夸克，115，pikpak，天翼云等，smb，webdav的nas访问
-- 自动抓取影视信息、自动分类、自动分季、分集展示
-- 支持倍速、截图、调色、在线字幕等等播放器众多功能
-- 支持 Emby，Jellyfin直连
-- 方便快速全局搜索
-- iCloud 云端同步
-- 支持直接文件源查看和操作，批量改名等
-- 支持映射播放HDR，杜比视界文件
-
-📢 AppStore搜索VidHub直接能下载
-
-🔗 下载地址
-https://apps.apple.com/app/apple-store/id1659622164?pt=122790787&mt=8&ct=linksys
-
-🆔 开发者信息
-https://zh.okaapps.com/support
-
-#### 开源许可
-本项目遵循 [LICENSE](LICENSE) 中所述的开源许可。
