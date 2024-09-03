@@ -1,6 +1,17 @@
 ### 交流群
 telegram: https://t.me/autosymlink_channel
 
+### Auto_Symlink
+**如果你觉得这个项目对你有帮助，可以考虑赞助我。你的支持将有助于这个项目的持续发展和改进🙏**
+
+微信:
+
+<img alt="Snipaste_2023-12-19_14-15-09" src="https://github.com/shenxianmq/Auto_Symlink/assets/76782947/77a14e36-c6dd-4ee8-ae86-f031fb50ffc0" width="15%">
+
+支付宝:
+
+<img src="https://github.com/shenxianmq/Auto_Symlink/assets/76782947/ec8a3d7d-41ba-42d9-bec0-73bad0147ce2" alt="image" width="15%">
+
 **小白牙整理**
 
 ### 项目简介
@@ -15,8 +26,6 @@ telegram: https://t.me/autosymlink_channel
 - **封面制作**: 自动生成精美的Emby媒体库封面
 - **Web 界面操作**: 提供一个简洁易用的Web界面，用于查看日志、编辑配置和监控系统状态。这使得用户能够更方便地管理和调整 Auto_Symlink 的运行。
 更多功能可以去**常用工具**中自行发掘.
-
-
 
 ---
 
@@ -90,9 +99,6 @@ telegram: https://t.me/autosymlink_channel
 - `-p 8095:8095`: 映射8095端口，可方便的查看日志以及管理服务。
 - `-v /path/to/auto_symlink/config:/app/config`: 将 `auto_symlink` 的配置目录映射到容器内的 `/app/config`。这样可以使容器中的 `auto_symlink` 使用外部的配置文件。
 - `--restart unless-stopped`: 设置容器在退出时自动重启。
-- `--log-opt max-size=10m`: 设置容器日志文件的最大大小为 10MB。
-- `--log-opt max-file=3`: 设置容器日志文件的最大文件数为 3。
-
 
 #### 注意：
 - 映射云盘路径时必须使用绝对路径（虽然此处是本工具的docker运行说明，但EMBY也应使用同样的绝对路径，否则软连接将指向错误的位置，从而导致无法播放），以确保软连接可以正确指向原始文件或目录。
@@ -140,14 +146,3 @@ systemctl daemon-reload
 添加后手动运行一次，之后开机会自动运行
 
 ---
-
-### Auto_Symlink
-**如果你觉得这个项目对你有帮助，可以考虑赞助我。你的支持将有助于这个项目的持续发展和改进。谢谢你的考虑！🙏**
-
-微信:
-
-<img alt="Snipaste_2023-12-19_14-15-09" src="https://github.com/shenxianmq/Auto_Symlink/assets/76782947/77a14e36-c6dd-4ee8-ae86-f031fb50ffc0" width="15%">
-
-支付宝:
-
-<img src="https://github.com/shenxianmq/Auto_Symlink/assets/76782947/ec8a3d7d-41ba-42d9-bec0-73bad0147ce2" alt="image" width="15%">
