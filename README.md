@@ -1,6 +1,9 @@
 ### 交流群
 telegram: https://t.me/autosymlink_channel
 
+### 简易文档
+https://github.com/shenxianmq/AutoSymlink-Readme/tree/main
+
 ### Auto_Symlink
 **如果你觉得这个项目对你有帮助，可以考虑赞助我。你的支持将有助于这个项目的持续发展和改进🙏**
 
